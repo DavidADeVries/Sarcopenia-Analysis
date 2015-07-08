@@ -16,9 +16,9 @@ if ~cancelled
         [exportFilename, exportPathname, ~] = uigetfile(fileOptions, popupTitle, path);
     end
     
-    exportPath = strcat(exportPathname, exportFilename);
+    if exportFilename ~= 0 %didn't click cancel
+        exportPath = strcat(exportPathname, exportFilename);    
     
-    if ~isempty(exportPath) %didn't click cancel
         exportToCsv(patients, exportPath, overwrite);
         
         waitfor(exportCompleteDialog());
