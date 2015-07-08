@@ -5,13 +5,16 @@ function [ ] = updateGui(currentFile, handles)
 %occuring within a file
 
 updateImageInfo(currentFile, handles);
+
 updatePatientSelector(handles);
-updateTissueAnalysisTable(currentFile, handles)
+updateStudySelector(handles);
+updateSeriesSelector(handles);
+
 updateUnitPanel(currentFile, handles);
 
-disableAllToggles(handles);
-updateToggleButtons(currentFile, handles);
+updateTissueAnalysisTable(currentFile, handles)
 
+updateToggleButtons(handles);
 
 end
 

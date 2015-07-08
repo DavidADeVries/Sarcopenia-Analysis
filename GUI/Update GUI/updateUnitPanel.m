@@ -2,10 +2,16 @@ function [] = updateUnitPanel(currentFile, handles)
 %updateUnitPanel takes the unitPanel radio buttons and enables/disables
 %them
 
-if ~isempty(currentFile) && currentFile.quickMeasureOn
-    enableVal = 'on';
+if isempty(currentFile)
+    enableVal = 'off';
     
-    switch currentFile.displayUnits
+    set(handles.unitNone, 'Value', 1);
+elseif currentFile.quickMeasureOn
+    displayUnits = currentFile.displayUnits();
+    
+    enableVal = 'on';
+      
+    switch displayUnits
         case 'none'
             set(handles.unitNone, 'Value', 1);
         case 'absolute'
@@ -15,10 +21,11 @@ if ~isempty(currentFile) && currentFile.quickMeasureOn
         otherwise
             set(handles.unitNone, 'Value', 1);
     end
-else
+else %nothing is on that needs unit measurement
     enableVal = 'off';
 end
 
+% apply the found enableVal to each radio button
 set(handles.unitNone, 'Enable', enableVal);
 set(handles.unitAbsolute, 'Enable', enableVal);
 set(handles.unitPixel, 'Enable', enableVal);

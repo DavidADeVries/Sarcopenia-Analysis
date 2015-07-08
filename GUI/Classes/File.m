@@ -5,6 +5,7 @@ classdef File
         dicomInfo
         date % I know dicomInfo would hold this, but to have it in an easily compared form is nice
         
+        name = '';
         image
         highlightedImage = [];
         
@@ -22,10 +23,11 @@ classdef File
     
     methods
         %% Constructor %%
-        function file = File(dicomInfo, dicomImage)
+        function file = File(name, dicomInfo, dicomImage)
             file.dicomInfo = dicomInfo;
             file.image = double(dicomImage);
-            file.date = Date(dicomInfo.AcquisitionDate);
+            file.date = Date(dicomInfo.StudyDate);
+            file.name = name;
             
             file.undoCache = UndoCache(file);
         end
@@ -58,6 +60,28 @@ classdef File
         %% deleteRoi %%
         function file = deleteRoi(file, roiIndex)
             file.roiPoints(roiIndex) = [];
+        end
+        
+        %% getSeriesDescription %%
+        function description = getSeriesDescription(file)
+            header = file.dicomInfo;
+            
+            if isfield(header, 'SeriesDescription')
+                description = header.SeriesDescription;
+            else
+                description = 'No Description Found';
+            end
+        end
+        
+        %% getStudyDescription %%
+        function description = getStudyDescription(file)
+            header = file.dicomInfo;
+            
+            if isfield(header, 'StudyDescription')
+                description = header.StudyDescription;
+            else
+                description = 'No Description Found';
+            end
         end
           
         
