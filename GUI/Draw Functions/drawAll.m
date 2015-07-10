@@ -3,6 +3,8 @@ function [ handles ] = drawAll(currentFile, handles, hObject, varargin )
 % Used when switching or opening files to get everything up right away
 % saveZoom optional: default is false
 
+handles = deleteAll(handles); % clear it all out first
+
 if isempty(currentFile)
     cla(handles.imageAxes);
 else

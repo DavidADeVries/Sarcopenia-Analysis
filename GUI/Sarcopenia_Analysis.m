@@ -7,6 +7,7 @@ function varargout = Sarcopenia_Analysis(varargin)
 %addpath('../arrow');
 %addpath('/data/projects/GJtube/metadata/MATLAB Image Functions');
 %addpath('/data/projects/GJtube/metadata/Peter Kovesi Computer Vision Libraries/Feature Detection');
+addpath(genpath('/data/projects/GJtube/General Image Analysis Toolkit/metadata'));
 addpath(genpath('.')); %add all subfolders in the current directory
 
 % SARCOPENIA_ANALYSIS MATLAB code for Sarcopenia_Analysis.fig
@@ -63,29 +64,11 @@ function Sarcopenia_Analysis_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   command line arguments to Sarcopenia_Analysis (see VARARGIN)
 
 % Choose default command line output for Sarcopenia_Analysis
-handles.output = hObject;
-
-handles.numPatients = 0; %records the number of images that are currently open
-handles.currentPatientNum = 0; %the current image being displayed
-handles.updateUndoCache = false; %tells upclick listener whether or not to save undo data
-handles.deleteRoiOn = false; %true if deleting ROIs by selection is active
-
-handles.patients = Patient.empty;
-
-% empty handle structures
-handles = emptyDisplayHandles(handles);
-
-
-%clear axes
+handles.deleteRoiOn = false;
 set(hObject, 'Pointer', 'arrow');
-axes(handles.imageAxes);
-imshow([],[]);
-cla(handles.imageAxes); % clear axes
 
-updateGui(File.empty, handles);
+giantOpeningFcn(hObject, handles);
 
-% Update handles structure
-guidata(hObject, handles);
 
 % UIWAIT makes Sarcopenia_Analysis wait for user response (see UIRESUME)
 % uiwait(handles.mainPanel);
@@ -102,56 +85,239 @@ function varargout = Sarcopenia_Analysis_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 
+% % % % % % % % % % % % % % % %
+% % GIANT BASE UI FUNCTIONS % %
+% % % % % % % % % % % % % % % %
+
+
+
 % --------------------------------------------------------------------
 function open_ClickedCallback(hObject, eventdata, handles)
 % hObject    handle to menuopen (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-allowedFileOptions = {...
-    '*.mat','Patient Analysis Files (*.mat)'};
-popupTitle = 'Select Patient Analysis Files';
-startingDirectory = Constants.SAVED_PATIENTS_DIRECTORY;
+giantOpen(hObject, handles);
 
-[imageFilename, imagePath, ~] = uigetfile(allowedFileOptions, popupTitle, startingDirectory);
+% --------------------------------------------------------------------
+function exportAllPatients_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to menuExportPatient (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 
-if imageFilename ~= 0 %user didn't click cancel!
-    completeFilepath = strcat(imagePath, imageFilename);
-    
-    openCancelled = false;
-    
-    % load previous analysis file .mat
-    loadedData = load(completeFilepath);
-    
-    patient = loadedData.patient;
-    
-    [patientNum, ~] = findPatient(handles.patients, patient.patientId);
-    
-    if patientNum == 0 % create new
-        handles.numPatients = handles.numPatients + 1;
-        patientNum = handles.numPatients;
-    else %overwrite whatever patient with the same id was there before
-        openCancelled = overwritePatientDialog(); %confirm with user that they want to overwrite
-    end
-    
-    if ~openCancelled        
-        handles.currentPatientNum = patientNum;
-        
-        currentFile = patient.getCurrentFile();
-        
-        handles = updatePatient(patient, handles);
-        
-        %update Gui
-        updateGui(currentFile, handles);
-        
-        
-        handles = deleteAll(handles);
-        handles = drawAll(currentFile, handles, hObject);        
-        
-        % pushup changes
-        guidata(hObject, handles);
-    end
-    
+giantExportAllPatients(hObject, handles);
+
+% --------------------------------------------------------------------
+function exportPatient_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to exportPatient (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantExportPatient(hObject, handles);
+
+% --------------------------------------------------------------------
+function closeAllPatients_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to closeAllPatients (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantCloseAllPatient(hObject, handles);
+
+% % % % --------------------------------------------------------------------
+% % % function undo_ClickedCallback(hObject, eventdata, handles) %#ok<*DEFNU>
+% % % % hObject    handle to undo (see GCBO)
+% % % % eventdata  reserved - to be defined in a future version of MATLAB
+% % % % handles    structure with handles and user data (see GUIDATA)
+% % % 
+% % % giantUndo(hObject, handles);
+% % % 
+% % % % --------------------------------------------------------------------
+% % % function redo_ClickedCallback(hObject, eventdata, handles)
+% % % % hObject    handle to redo (see GCBO)
+% % % % eventdata  reserved - to be defined in a future version of MATLAB
+% % % % handles    structure with handles and user data (see GUIDATA)
+% % % 
+% % % giantRedo(hObject, handles);
+
+% --------------------------------------------------------------------
+function undo_ClickedCallback(hObject, eventdata, handles) %#ok<*DEFNU>
+% hObject    handle to undo (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+currentFile = getCurrentFile(handles);
+
+currentFile = performUndo(currentFile);
+
+% finalize changes
+updateUndo = false;
+pendingChanges = true; 
+handles = updateFile(currentFile, updateUndo, pendingChanges, handles);
+
+% update display
+saveZoom = true; % preserves current zoom state
+
+handles = deleteAll(handles);
+handles = drawAll(currentFile, handles, hObject, saveZoom);
+
+updateToggleButtons(handles);
+updateUnitPanel(currentFile, handles);
+
+% push up the changes
+guidata(hObject, handles);
+
+% --------------------------------------------------------------------
+function redo_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to redo (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+currentFile = getCurrentFile(handles);
+
+currentFile = performRedo(currentFile);
+
+% finalize changes
+updateUndo = false;
+pendingChanges = true; 
+handles = updateFile(currentFile, updateUndo, pendingChanges, handles);
+
+% update display
+saveZoom = true; % preserves current zoom state
+
+handles = deleteAll(handles);
+handles = drawAll(currentFile, handles, hObject, saveZoom);
+
+updateToggleButtons(handles);
+updateUnitPanel(currentFile, handles);
+
+% push up the changes
+guidata(hObject, handles);
+
+
+
+% --------------------------------------------------------------------
+function earlierImage_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to earlierImage (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantEarlierImage(hObject, handles);
+
+% --------------------------------------------------------------------
+function laterImage_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to laterImage (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantLaterImage(hObject, handles);
+
+% --------------------------------------------------------------------
+function earliestImage_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to earliestImage (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantEarliestImage(hObject, handles);
+
+% --------------------------------------------------------------------
+function latestImage_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to latestImage (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantLatestImage(hObject, handles);
+
+% --- Executes on selection change in patientSelector.
+function patientSelector_Callback(hObject, eventdata, handles)
+% hObject    handle to patientSelector (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns patientSelector contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from patientSelector
+
+giantPatientSelector(hObject, handles);
+
+% --- Executes during object creation, after setting all properties.
+function patientSelector_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to patientSelector (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+% --------------------------------------------------------------------
+function savePatient_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to savePatient (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantSavePatient(hObject, handles);
+
+% --------------------------------------------------------------------
+function saveAll_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to saveAll (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantSaveAll(hObject, handles);
+
+% --------------------------------------------------------------------
+function closePatient_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to closeAllPatients (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantClosePatient(hObject, handles);
+
+% --- Executes on selection change in studySelector.
+function studySelector_Callback(hObject, eventdata, handles)
+% hObject    handle to studySelector (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns studySelector contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from studySelector
+
+giantStudySelector(hObject, handles);
+
+% --- Executes during object creation, after setting all properties.
+function studySelector_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to studySelector (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+% --- Executes on selection change in seriesSelector.
+function seriesSelector_Callback(hObject, eventdata, handles)
+% hObject    handle to seriesSelector (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns seriesSelector contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from seriesSelector
+
+giantSeriesSelector(hObject, handles);
+
+% --- Executes during object creation, after setting all properties.
+function seriesSelector_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to seriesSelector (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
 end
 
 % --------------------------------------------------------------------
@@ -160,41 +326,23 @@ function addPatient_ClickedCallback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-patientId = patientIdDialog();
+giantAddPatient(hObject, handles);
 
-if ~isempty(patientId) %empty means user pressed cancel, do nothing
-    [patientNum, ~] = findPatient(handles.patients, patientId); %see if the patient already exists
-    
-    openCancelled = false;
-    
-    if patientNum ~= 0 %ask user if they want to overwrite whatever patient with the same id was there before
-        openCancelled = overwritePatientDialog(); %confirm with user that they want to overwrite
-    else
-        handles.numPatients = handles.numPatients + 1;
-        patientNum = handles.numPatients;
-    end
-    
-    if ~openCancelled %is not cancelled, assign new patient
-        handles.currentPatientNum = patientNum;   
-        
-        newPatient = Patient(patientId, Study.empty);
-        newPatient.changesPending = true;
-        
-        handles = updatePatient(newPatient, handles); %will automatically set newPatient into current patient spot
-        
-        currentFile = getCurrentFile(handles);
-        
-        %update GUI
-        updateGui(currentFile, handles);
-        
-        %draw new image
-        handles = deleteAll(handles);
-        handles = drawAll(currentFile, handles, hObject);
-        
-        %push up changes
-        guidata(hObject, handles);
-    end
-end
+% --------------------------------------------------------------------
+function addStudy_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to menuAddStudy (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantAddStudy(hObject, handles);
+
+% --------------------------------------------------------------------
+function addSeries_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to addSeries (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantAddSeries(hObject, handles);
 
 % --------------------------------------------------------------------
 function addFile_ClickedCallback(hObject, eventdata, handles)
@@ -202,111 +350,56 @@ function addFile_ClickedCallback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-allowedFileOptions = {...
-    '*.dcm','DICOM Files (*.dcm)'};
-popupTitle = 'Select Image';
-startingDirectory = Constants.RAW_DATA_DIRECTORY;
-
-[imageFilename, imagePath, ~] = uigetfile(allowedFileOptions, popupTitle, startingDirectory);
-
-if imageFilename ~= 0 %user didn't click cancel!
-    currentPatient = getCurrentPatient(handles);
-    
-    completeFilepath = strcat(imagePath, imageFilename);
-    dicomInfo = dicominfo(completeFilepath);
-    
-    if strcmp(dicomInfo.PatientID, currentPatient.patientId) %double check sure patient is the same
-        dicomImage = dicomread(completeFilepath);
-        
-        if (length(size(dicomImage)) == 2) %no multisplice support, sorry
-            
-            newFile = File(imageFilename, dicomInfo, dicomImage);
-            
-            currentPatient = currentPatient.addFile(newFile);
-            
-            currentPatient.changesPending = true;
-            
-            handles = updatePatient(currentPatient, handles);
-            
-            currentFile = getCurrentFile(handles);
-            
-            %update view
-            updateImageInfo(currentFile, handles);
-            updateToggleButtons(handles);
-            updateUnitPanel(currentFile, handles);
-            
-            handles = deleteAll(handles);
-            handles = drawAll(currentFile, handles, hObject);
-            
-            %push up changes
-            
-            guidata(hObject, handles);
-        else
-            waitfor(msgbox('Multi-slice images are not supported!','Error','error'));
-        end
-    else
-        waitfor(patientIdConflictDialog(currentPatient.patientId, dicomInfo.PatientID, completeFilepath));
-    end
-end
+giantAddFile(hObject, handles);
 
 % --------------------------------------------------------------------
-function exportAllPatients_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to menuExportPatient (see GCBO)
+function removeStudy_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to removeStudy (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-exportPatients(handles.patients);
-
+giantRemoveStudy(hObject, handles);
 
 % --------------------------------------------------------------------
-function exportPatient_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to exportPatient (see GCBO)
+function removeSeries_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to removeSeries (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-exportPatients(getCurrentPatient(handles));
-
+giantRemoveSeries(hObject, handles);
 
 % --------------------------------------------------------------------
-function closeAllPatients_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to closeAllPatients (see GCBO)
+function removeFile_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to removeFile (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-for i=1:handles.numPatients
-    patient = handles.patients(i);
-    
-    closeCancelled = false;
-    saveFirst = false;
-    
-    if patient.changesPending;
-        [closeCancelled, saveFirst] = pendingChangesDialog(); %prompts user if they want to save unsaved changes
-    end
-    
-    if closeCancelled
-        break;
-    elseif saveFirst %user chose to save
-        patient.saveToDisk();
-    end  
-end
+giantRemoveFile(hObject, handles);
 
-if ~closeCancelled
-    handles.patients = Patient.empty;
-    handles.currentPatientNum = 0;
-    handles.numPatients = 0;
-    
-    currentFile = File.empty;
-    
-    %GUI updated
-    updateGui(currentFile, handles);
-    
-    %displayed imaged updated
-    handles = deleteAll(handles);
-    handles = drawAll(currentFile, handles, hObject);
-    
-    %push up changes
-    guidata(hObject, handles);
-end
+% --------------------------------------------------------------------
+function importPatientDirectory_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to importPatientDirectory (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantImportPatientDirectory(hObject, handles);
+
+% --------------------------------------------------------------------
+function menuSavePatientAs_Callback(hObject, eventdata, handles)
+% hObject    handle to menuSavePatientAs (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantSavePatientAs(hObject, handles);
+
+
+
+
+% % % % % % % % % % % % % % % % %
+% % MODULE SPECIFIC FUNCTIONS % %
+% % % % % % % % % % % % % % % % %
+
+
 
 % --- Executes on mouse press over figure background, over a disabled or
 % --- inactive control, or over an axes background.
@@ -493,279 +586,7 @@ updateUnitPanel(currentFile, handles);
 guidata(hObject, handles);
 
 
-% --------------------------------------------------------------------
-function undo_ClickedCallback(hObject, eventdata, handles) %#ok<*DEFNU>
-% hObject    handle to undo (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-currentFile = getCurrentFile(handles);
-
-currentFile = performUndo(currentFile);
-
-% finalize changes
-updateUndo = false;
-pendingChanges = true; 
-handles = updateFile(currentFile, updateUndo, pendingChanges, handles);
-
-% update display
-saveZoom = true; % preserves current zoom state
-
-handles = deleteAll(handles);
-handles = drawAll(currentFile, handles, hObject, saveZoom);
-
-updateToggleButtons(handles);
-updateUnitPanel(currentFile, handles);
-
-% push up the changes
-guidata(hObject, handles);
-
-% --------------------------------------------------------------------
-function redo_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to redo (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-currentFile = getCurrentFile(handles);
-
-currentFile = performRedo(currentFile);
-
-% finalize changes
-updateUndo = false;
-pendingChanges = true; 
-handles = updateFile(currentFile, updateUndo, pendingChanges, handles);
-
-% update display
-saveZoom = true; % preserves current zoom state
-
-handles = deleteAll(handles);
-handles = drawAll(currentFile, handles, hObject, saveZoom);
-
-updateToggleButtons(handles);
-updateUnitPanel(currentFile, handles);
-
-% push up the changes
-guidata(hObject, handles);
-
-% --------------------------------------------------------------------
-function earlierImage_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to earlierImage (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-currentPatient = getCurrentPatient(handles);
-
-currentPatient = currentPatient.earlierImage();
-
-currentPatient.changesPending = true;
-
-handles = updatePatient(currentPatient, handles);
-
-currentFile = getCurrentFile(handles);
-
-%update GUI
-updateImageInfo(currentFile, handles);
-updateToggleButtons(handles);
-updateUnitPanel(currentFile, handles);
-
-%draw new image
-handles = deleteAll(handles);
-handles = drawAll(currentFile, handles, hObject);
-
-%push up changes
-guidata(hObject, handles);
-
-
-% --------------------------------------------------------------------
-function laterImage_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to laterImage (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-currentPatient = getCurrentPatient(handles);
-
-currentPatient = currentPatient.laterImage();
-
-currentPatient.changesPending = true;
-
-handles = updatePatient(currentPatient, handles);
-
-currentFile = getCurrentFile(handles);
-
-%update GUI
-updateImageInfo(currentFile, handles);
-updateToggleButtons(handles);
-updateUnitPanel(currentFile, handles);
-
-%draw new image
-handles = deleteAll(handles);
-handles = drawAll(currentFile, handles, hObject);
-
-%push up changes
-guidata(hObject, handles);
-
-
-% --------------------------------------------------------------------
-function earliestImage_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to earliestImage (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-currentPatient = getCurrentPatient(handles);
-
-currentPatient = currentPatient.earliestImage();
-
-currentPatient.changesPending = true;
-
-handles = updatePatient(currentPatient, handles);
-
-currentFile = getCurrentFile(handles);
-
-%update GUI
-updateImageInfo(currentFile, handles);
-updateToggleButtons(handles);
-updateUnitPanel(currentFile, handles);
-
-%draw new image
-handles = deleteAll(handles);
-handles = drawAll(currentFile, handles, hObject);
-
-%push up changes
-guidata(hObject, handles);
-
-% --------------------------------------------------------------------
-function latestImage_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to latestImage (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-currentPatient = getCurrentPatient(handles);
-
-currentPatient = currentPatient.latestImage();
-
-currentPatient.changesPending = true;
-
-handles = updatePatient(currentPatient, handles);
-
-currentFile = getCurrentFile(handles);
-
-%update GUI
-updateImageInfo(currentFile, handles);
-updateToggleButtons(handles);
-updateUnitPanel(currentFile, handles);
-
-%draw new image
-handles = deleteAll(handles);
-handles = drawAll(currentFile, handles, hObject);
-
-%push up changes
-guidata(hObject, handles);
-
-% --- Executes on selection change in patientSelector.
-function patientSelector_Callback(hObject, eventdata, handles)
-% hObject    handle to patientSelector (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns patientSelector contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from patientSelector
-
-handles.currentPatientNum = get(hObject,'Value');
-
-currentFile = getCurrentFile(handles);
-
-%update GUI
-updateGui(currentFile, handles);
-
-%draw new image
-handles = deleteAll(handles);
-handles = drawAll(currentFile, handles, hObject);
-
-%push up changes
-guidata(hObject, handles);
-
-
-
-% --- Executes during object creation, after setting all properties.
-function patientSelector_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to patientSelector (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --------------------------------------------------------------------
-function savePatient_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to savePatient (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-currentPatient = getCurrentPatient(handles);
-
-currentPatient = currentPatient.saveToDisk();
-
-handles = updatePatient(currentPatient, handles);
-
-updateToggleButtons(handles);
-
-guidata(hObject, handles);
-
-
-% --------------------------------------------------------------------
-function saveAll_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to saveAll (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-for i=1:handles.numPatients
-    patient = handles.patients(i).saveToDisk();
-        
-    handles = updatePatient(patient, handles, i);    
-end
-
-updateToggleButtons(handles);
-
-guidata(hObject, handles);
-
-% --------------------------------------------------------------------
-function closePatient_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to closeAllPatients (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-currentPatient = getCurrentPatient(handles);
-
-closeCancelled = false;
-saveFirst = false;
-
-if currentPatient.changesPending;
-    [closeCancelled, saveFirst] = pendingChangesDialog(); %prompts user if they want to save unsaved changes
-end
-
-if ~closeCancelled
-    if saveFirst %user chose to save
-        currentPatient.saveToDisk();
-    end
-    
-    handles = removeCurrentPatient(handles); %patient removed from patient list
-    
-    currentFile = getCurrentFile(handles);
-    
-    %GUI updated
-    updateGui(currentFile, handles);
-    
-    %displayed imaged updated
-    handles = deleteAll(handles);
-    handles = drawAll(currentFile, handles, hObject);
-    
-    %push up changes
-    guidata(hObject, handles);  
-end
 
 % --------------------------------------------------------------------
 function menuFile_Callback(hObject, eventdata, handles)
@@ -798,23 +619,6 @@ function menuSaveAll_Callback(hObject, eventdata, handles)
 
 saveAll_ClickedCallback(hObject, eventdata, handles);
 
-% --------------------------------------------------------------------
-function menuSavePatientAs_Callback(hObject, eventdata, handles)
-% hObject    handle to menuSavePatientAs (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-currentPatient = getCurrentPatient(handles);
-
-currentPatient.savePath = ''; %clear it so that it will be redefined (save as)
-
-currentPatient = currentPatient.saveToDisk();
-
-handles = updatePatient(currentPatient, handles);
-
-updateToggleButtons(handles);
-
-guidata(hObject, handles);
 
 % --------------------------------------------------------------------
 function menuSelectRoi_Callback(hObject, eventdata, handles)
@@ -912,38 +716,6 @@ function menuToggleQuickMeasure_Callback(hObject, eventdata, handles)
 
 toggleQuickMeasure_ClickedCallback(hObject, eventdata, handles);
 
-
-% --------------------------------------------------------------------
-function removeFile_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to removeFile (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-question = 'Are you sure you want to remove the current file? This cannot be undone!';
-title = 'Remove Current File';
-
-cancelled = confirmRemoveDialog(question, title);
-
-if ~cancelled    
-    currentPatient = getCurrentPatient(handles);
-    
-    currentPatient = currentPatient.removeCurrentFile(); 
-    
-    currentPatient.changesPending = true;
-    
-    handles = updatePatient(currentPatient, handles);    
-    currentFile = currentPatient.getCurrentFile();
-    
-    %GUI updated
-    updateGui(currentFile, handles);
-    
-    %displayed imaged updated
-    handles = deleteAll(handles);
-    handles = drawAll(currentFile, handles, hObject);
-    
-    %push up changes
-    guidata(hObject, handles);  
-end
 
 % --------------------------------------------------------------------
 function menuRemoveFile_Callback(hObject, eventdata, handles)
@@ -1214,14 +986,6 @@ updateToggleButtons(handles);
 guidata(hObject, handles);
 
 
-
-% --------------------------------------------------------------------
-function addSliceSeries_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to addSliceSeries (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
 % --------------------------------------------------------------------
 function deleteRoi_ClickedCallback(hObject, eventdata, handles)
 % hObject    handle to deleteRoi (see GCBO)
@@ -1260,87 +1024,6 @@ function menuDeleteRoi_Callback(hObject, eventdata, handles)
 
 deleteRoi_ClickedCallback(hObject, eventdata, handles);
 
-
-% --- Executes on selection change in studySelector.
-function studySelector_Callback(hObject, eventdata, handles)
-% hObject    handle to studySelector (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns studySelector contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from studySelector
-
-currentPatient = getCurrentPatient(handles);
-
-currentPatient.currentStudyNum = get(hObject,'Value');
-
-handles = updatePatient(currentPatient, handles);
-
-currentFile = getCurrentFile(handles);
-
-%update GUI
-updateGui(currentFile, handles);
-
-%draw new image
-handles = deleteAll(handles);
-handles = drawAll(currentFile, handles, hObject);
-
-%push up changes
-guidata(hObject, handles);
-
-% --- Executes during object creation, after setting all properties.
-function studySelector_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to studySelector (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on selection change in seriesSelector.
-function seriesSelector_Callback(hObject, eventdata, handles)
-% hObject    handle to seriesSelector (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns seriesSelector contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from seriesSelector
-
-currentPatient = getCurrentPatient(handles);
-
-currentPatient = currentPatient.setCurrentSeriesNum(get(hObject,'Value'));
-
-handles = updatePatient(currentPatient, handles);
-
-currentFile = getCurrentFile(handles);
-
-%update GUI
-updateGui(currentFile, handles);
-
-%draw new image
-handles = deleteAll(handles);
-handles = drawAll(currentFile, handles, hObject);
-
-%push up changes
-guidata(hObject, handles);
-
-% --- Executes during object creation, after setting all properties.
-function seriesSelector_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to seriesSelector (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
 % --------------------------------------------------------------------
 function menuEarlierImage_Callback(hObject, eventdata, handles)
 % hObject    handle to menuEarlierImage (see GCBO)
@@ -1374,181 +1057,6 @@ function menuLatestImage_Callback(hObject, eventdata, handles)
 
 latestImage_ClickedCallback(hObject, eventdata, handles);
 
-% --------------------------------------------------------------------
-function importPatientDirectory_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to importPatientDirectory (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-folderPath = uigetdir(Constants.RAW_DATA_DIRECTORY, 'Select Patient Directory');
-
-if folderPath ~= 0 %didn't click cancel
-    waitHandle = pleaseWaitDialog('importing directory.');
-    
-    [studies, patientId] = createStudies(folderPath); %recursively creates studies, containing series, containing files (dicoms)
-        
-    if ~isempty(patientId) %if empty, there must have been no files contained in the directories given
-        [patientNum, ~] = findPatient(handles.patients, patientId); %see if the patient already exists
-        
-        openCancelled = false;
-        
-        if patientNum ~= 0 %ask user if they want to overwrite whatever patient with the same id was there before
-            openCancelled = overwritePatientDialog(); %confirm with user that they want to overwrite
-        else
-            handles.numPatients = handles.numPatients + 1;
-            patientNum = handles.numPatients;
-        end
-        
-        if ~openCancelled %is not cancelled, assign new patient
-            handles.currentPatientNum = patientNum;
-            
-            patient = Patient(patientId, studies);
-            
-            patient.changesPending = true;
-            
-            handles = updatePatient(patient, handles);
-            
-            currentFile = getCurrentFile(handles);
-            
-            %update view
-            updateGui(currentFile, handles);
-            
-            handles = deleteAll(handles);
-            handles = drawAll(currentFile, handles, hObject);
-            
-            %push up changes
-            
-            guidata(hObject, handles);
-        end
-    end
-    
-    delete(waitHandle);
-end
-
-% --------------------------------------------------------------------
-function addStudy_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to addStudy (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-studyName = studyNameDialog();
-
-if ~isempty(studyName) %empty means user pressed cancel, do nothing
-    currentPatient = getCurrentPatient(handles);
-    
-    newStudy = Study(studyName, Series.empty);
-    
-    currentPatient = currentPatient.addStudy(newStudy);
-    
-    currentPatient.changesPending = true;
-    
-    handles = updatePatient(currentPatient, handles);
-    currentFile = getCurrentFile(handles);
-    
-    %update GUI
-    updateGui(currentFile, handles);
-    
-    %draw new image
-    handles = deleteAll(handles);
-    handles = drawAll(currentFile, handles, hObject);
-    
-    %push up changes
-    guidata(hObject, handles);
-end
-
-% --------------------------------------------------------------------
-function addSeries_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to addSeries (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-seriesName = seriesNameDialog();
-
-if ~isempty(seriesName) %empty means user pressed cancel, do nothing
-    currentPatient = getCurrentPatient(handles);
-
-    newSeries = Series(seriesName, File.empty);
-    
-    currentPatient = currentPatient.addSeries(newSeries);
-    
-    currentPatient.changesPending = true;
-    
-    handles = updatePatient(currentPatient, handles);
-    currentFile = getCurrentFile(handles);
-    
-    %update GUI
-    updateGui(currentFile, handles);
-    
-    %draw new image
-    handles = deleteAll(handles);
-    handles = drawAll(currentFile, handles, hObject);
-    
-    %push up changes
-    guidata(hObject, handles);
-end
-
-
-% --------------------------------------------------------------------
-function removeStudy_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to removeStudy (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-question = 'Are you sure you want to remove the current study and all contained series and files? This cannot be undone!';
-title = 'Remove Current Study';
-
-cancelled = confirmRemoveDialog(question, title);
-
-if ~cancelled
-    currentPatient = getCurrentPatient(handles);
-    
-    currentPatient = currentPatient.removeCurrentStudy();
-    currentPatient.changesPending = true;
-    
-    handles = updatePatient(currentPatient, handles);
-    currentFile = getCurrentFile(handles);
-    
-    %update GUI
-    updateGui(currentFile, handles);
-    
-    %draw new image
-    handles = deleteAll(handles);
-    handles = drawAll(currentFile, handles, hObject);
-    
-    %push up changes
-    guidata(hObject, handles);
-end
-
-% --------------------------------------------------------------------
-function removeSeries_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to removeSeries (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-question = 'Are you sure you want to remove the current series and all contained files? This cannot be undone!';
-title = 'Remove Current Series';
-
-cancelled = confirmRemoveDialog(question, title);
-
-if ~cancelled
-    currentPatient = getCurrentPatient(handles);
-    
-    currentPatient = currentPatient.removeCurrentSeries();
-    currentPatient.changesPending = true;
-    
-    handles = updatePatient(currentPatient, handles);
-    currentFile = getCurrentFile(handles);
-    
-    %update GUI
-    updateGui(currentFile, handles);
-    
-    %draw new image
-    handles = deleteAll(handles);
-    handles = drawAll(currentFile, handles, hObject);
-    
-    %push up changes
-    guidata(hObject, handles);
-end
 
 % --------------------------------------------------------------------
 function menuImportPatientDirectory_Callback(hObject, eventdata, handles)
