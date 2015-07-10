@@ -1,4 +1,4 @@
-function [ sortedClusterIndices ] = performClusterAnalysis2( data )
+function [ sortedClusterIndices ] = performClusterAnalysis4( data )
 % [ sortedClusterIndices ] = performClusterAnalysis( data, numClusters )
 % divides the data into numClusters using the k-means algorithm. The
 % clusters are returned sorted, from lowest mean intensities to the highest
@@ -18,7 +18,7 @@ start = zeros(2,1,2);
 start(:,:,1) = trial1;
 start(:,:,2) = trial2;
 
-[clusterIdX, ~] = kmeans(data, 2, 'Start', start);
+[clusterIdX, C] = kmeans(data, 2, 'Start', start);
 
 clusterIndices = cell(2);
 clusterMeanIntensities = zeros(2,1);

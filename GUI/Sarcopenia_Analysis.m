@@ -767,10 +767,6 @@ if ~closeCancelled
     guidata(hObject, handles);  
 end
 
-    
-    
-
-
 % --------------------------------------------------------------------
 function menuFile_Callback(hObject, eventdata, handles)
 % hObject    handle to menuFile (see GCBO)
