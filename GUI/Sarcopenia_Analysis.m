@@ -2,10 +2,11 @@ function varargout = Sarcopenia_Analysis(varargin)
 
 % add needed librarys
 
-addpath(genpath('/data/projects/General Image Analysis Toolkit/Current Release/GIANT Code'));
-addpath('/data/projects/General Image Analysis Toolkit/Current Release/Common Module Functions/Quick Measure');
-addpath('/data/projects/General Image Analysis Toolkit/Current Release/Common Module Functions/Plot Impoint');
 addpath(genpath('.')); %add all subfolders in the current directory
+
+addpath(genpath(strcat(Constants.GIANT_PATH, 'GIANT Code')));
+addpath(strcat(Constants.GIANT_PATH, 'Common Module Functions/Quick Measure'));
+addpath(strcat(Constants.GIANT_PATH,'Common Module Functions/Plot Impoint'));
 
 % SARCOPENIA_ANALYSIS MATLAB code for Sarcopenia_Analysis.fig
 %      SARCOPENIA_ANALYSIS, by itself, creates a new SARCOPENIA_ANALYSIS or raises the existing
