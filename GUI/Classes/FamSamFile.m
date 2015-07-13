@@ -1,4 +1,4 @@
-classdef SarcoFile < File
+classdef FamSamFile < File
     %file represents an open DICOM file
     
     properties
@@ -16,7 +16,7 @@ classdef SarcoFile < File
     
     methods
         %% Constructor %%
-        function file = SarcoFile(name, dicomInfo, dicomImage)
+        function file = FamSamFile(name, dicomInfo, dicomImage)
             file@File(name, dicomInfo, dicomImage);
         end
         
@@ -27,6 +27,12 @@ classdef SarcoFile < File
             else
                 image = file.image;
             end
+        end
+        
+        %% isValidForExport %%
+        % ** required by GIANT **
+        function isValid = isValidForExport(file)
+            isValid = ~isempty(file.pixelCounts);
         end
         
         %% getPixelArea %%
@@ -48,6 +54,16 @@ classdef SarcoFile < File
         %% deleteRoi %%
         function file = deleteRoi(file, roiIndex)
             file.roiPoints(roiIndex) = [];
+        end
+        
+        %% setQuickMeasurePoints %%
+        function file = setQuickMeasurePoints(file, points)
+            file.quickMeasurePoints = points;
+        end
+        
+        %% getQuickMeasurePoints %%
+        function points = getQuickMeasurePoints(file)
+            points = file.quickMeasurePoints;
         end
           
         

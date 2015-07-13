@@ -2,7 +2,7 @@ function [ file ] = emptyFile()
 %[ file ] = emptyFile()
 %   as required by GIANT
 
-file = SarcoFile.empty;
+file = FamSamFile.empty;
 
 end
 

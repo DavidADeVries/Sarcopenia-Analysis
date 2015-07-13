@@ -2,9 +2,9 @@ classdef Constants
     %Constants stores the constants
     
     properties (Constant = true)
-        SAVED_PATIENTS_DIRECTORY = '/data/projects/GJtube/Muscle Segmentation Project/Sarcopenia Study Data/Saved Patient Analysis/'; %make sure it's absolute and ends with '/'
-        RAW_DATA_DIRECTORY = '/data/projects/GJtube/Muscle Segmentation Project/Sarcopenia Study Data/Raw Data/';
-        CSV_EXPORT_DIRECTORY = '/data/projects/GJtube/Muscle Segmentation Project/Sarcopenia Study Data/Exported Spreadsheets/';        
+        SAVED_PATIENTS_DIRECTORY = '/data/projects/Sarcopenia/Sarcopenia Study/Saved Patient Analysis/'; %make sure it's absolute and ends with '/'
+        RAW_DATA_DIRECTORY = '/data/projects/Sarcopenia/Sarcopenia Study/Raw Data/';
+        CSV_EXPORT_DIRECTORY = '/data/projects/Sarcopenia/Sarcopenia Study/Exported Spreadsheets/';        
         
         SAVE_TITLE_SUGGESTION = 'Sarcopenia Analysis';
         

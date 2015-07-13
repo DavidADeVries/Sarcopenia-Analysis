@@ -2,12 +2,9 @@ function varargout = Sarcopenia_Analysis(varargin)
 
 % add needed librarys
 
-%addpath('../Image Processing');
-%addpath('../CircStat2012a');
-%addpath('../arrow');
-%addpath('/data/projects/GJtube/metadata/MATLAB Image Functions');
-%addpath('/data/projects/GJtube/metadata/Peter Kovesi Computer Vision Libraries/Feature Detection');
-addpath(genpath('/data/projects/GJtube/General Image Analysis Toolkit/metadata'));
+addpath(genpath('/data/projects/General Image Analysis Toolkit/Current Release/GIANT Code'));
+addpath('/data/projects/General Image Analysis Toolkit/Current Release/Common Module Functions/Quick Measure');
+addpath('/data/projects/General Image Analysis Toolkit/Current Release/Common Module Functions/Plot Impoint');
 addpath(genpath('.')); %add all subfolders in the current directory
 
 % SARCOPENIA_ANALYSIS MATLAB code for Sarcopenia_Analysis.fig
