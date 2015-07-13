@@ -23,6 +23,8 @@ if ~toggled
     if isempty(splineHandle) %create new
         if ~isempty(roiPoints)
             %constants
+            lineWidth = Constants.ROI_LINE_WIDTH;
+            lineColour = Constants.ROI_LINE_COLOUR;
             
             %find spline
             roiPoints = [roiPoints; roiPoints(1,:)]; %duplicate last point
@@ -35,7 +37,7 @@ if ~toggled
             %plot spline
             hold on;
             points = fnplt(spline);
-            splineHandle = plot(points(1,:),points(2,:));
+            splineHandle = plot(points(1,:), points(2,:), 'LineWidth', lineWidth, 'Color', lineColour);
 %             roiSplineHandle = impoly(handles.imageAxes, points');
 %             setVerticesDraggable(roiSplineHandle, false);
             hold off;
