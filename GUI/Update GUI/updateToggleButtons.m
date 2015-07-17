@@ -38,9 +38,16 @@ if ~isempty(currentFile) %add in module file operations
     end
     
     %analysis highlighting
-    if ~isempty(currentFile.highlightedImage)
+    if ~isempty(currentFile.clusterMap)
         set(handles.toggleHighlighting, 'Enable', 'on');
         set(handles.menuToggleHighlighting, 'Enable', 'on');
+        
+        % allow trimming        
+        set(handles.trimFat, 'Enable', 'on');
+        set(handles.trimMuscle, 'Enable', 'on');
+        
+        set(handles.menuTrimFat, 'Enable', 'on');
+        set(handles.menuTrimMuscle, 'Enable', 'on');
     end
     
     if currentFile.highlightingOn

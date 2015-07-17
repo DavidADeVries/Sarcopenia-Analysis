@@ -11,6 +11,7 @@ classdef FamSamFile < File
         
         roiPoints = cell(0);        
         quickMeasurePoints = [];
+        pixelCounts = PixelCounts.empty; %stores the number of pixel of each intensity for each ROI
     end
     
     methods
@@ -143,64 +144,59 @@ classdef FamSamFile < File
          %% getStats %%
         function [csas, percentages] = getStats(file, image)
             pixelArea = file.getPixelArea();
-            clusterTags = Constants.CLUSTER_MAP_TAGS;
             
             % count up number of pixels for ROIs
             
             roiMasks = file.getRoiMasks(image);
             
-            leftRoiMask = roiMasks{1};
-            
-            if file.numRoi == 1
-                rightRoiMask = []; % kept empty, or else left and right ROI will be the same
-            else
-                rightRoiMask = roiMasks{file.numRoi};
-            end
+            leftRoiMask = roiMasks(1);
+            rightRoiMask = roiMasks(file.numRoi);
             
             localClusterMap = file.clusterMap;
             
-            leftClusterMap = localClusterMap(leftRoiMask==1);
-            rightClusterMap = localClusterMap(rightRoiMask==1);
+            leftClusterMap = localClusterMap(leftRoiMask);
+            rightClusterMap = localClusterMap(rightRoiMask);
             
-            leftFatCount = sum(leftClusterMap == clusterTags.fat);
-            leftMuscleCount = sum(leftClusterMap == clusterTags.muscle);
-            leftOtherCount = sum(leftClusterMap == clusterTags.other);
             
-            rightFatCount = sum(rightClusterMap == clusterTags.fat);
-            rightMuscleCount = sum(rightClusterMap == clusterTags.muscle);
-            rightOtherCount = sum(rightClusterMap == clusterTags.other);
-                        
-            totalLeft = sum([leftFatCount, leftMuscleCount, leftOtherCount]);
-            totalRight = sum([rightFatCount, rightMuscleCount, rightOtherCount]);
+            localLeftFat = pixelCounts.leftFat;
+            localLeftMuscle = pixelCounts.localLeftMuscleuscle;
+            localLeftOther = pixelCounts.leftOther;
+            
+            localRightFat = pixelCounts.rightFat;
+            localRightMuscle = pixelCounts.localRightMuscleuscle;
+            localRightOther = pixelCounts.rightOther;
+            
+            totalLeft = sum([localLeftFat, localLeftMuscle, localLeftOther]);
+            totalRight = sum([localRightFat, localRightMuscle, localRightOther]);
             totalBoth = totalLeft + totalRight;
             
             % figure out CSAs and percentages
             
             % cross sectional areas (CSA)
-            leftFatCsa = leftFatCount * pixelArea;
-            leftMuscleCsa = leftMuscleCount * pixelArea;
-            leftOtherCsa = leftOtherCount * pixelArea;
+            leftFatCsa = localLeftFat * pixelArea;
+            leftMuscleCsa = localLeftMuscle * pixelArea;
+            leftOtherCsa = localLeftOther * pixelArea;
             
-            rightFatCsa = rightFatCount * pixelArea;
-            rightMuscleCsa = rightMuscleCount * pixelArea;
-            rightOtherCsa = rightOtherCount * pixelArea;
+            rightFatCsa = localRightFat * pixelArea;
+            rightMuscleCsa = localRightMuscle * pixelArea;
+            rightOtherCsa = localRightOther * pixelArea;
             
-            totalFatCsa = (leftFatCount + rightFatCount) * pixelArea;
-            totalMuscleCsa = (leftMuscleCount + rightMuscleCount) * pixelArea;
-            totalOtherCsa = (leftOtherCount + rightOtherCount) * pixelArea;
+            totalFatCsa = (localLeftFat + localRightFat) * pixelArea;
+            totalMuscleCsa = (localLeftMuscle + localRightMuscle) * pixelArea;
+            totalOtherCsa = (localLeftOther + localRightOther) * pixelArea;
             
             % percentages
-            localLeftFatPercent = 100 * (leftFatCount / totalLeft);
-            localLeftMusclePercent = 100 * (leftMuscleCount / totalLeft);
-            localLeftOtherPercent = 100 * (leftOtherCount / totalLeft);
+            localLeftFatPercent = 100 * (localLeftFat / totalLeft);
+            localLeftMusclePercent = 100 * (localLeftMuscle / totalLeft);
+            localLeftOtherPercent = 100 * (localLeftOther / totalLeft);
             
-            localRightFatPercent = 100 * (rightFatCount / totalRight);
-            localRightMusclePercent = 100 * (rightMuscleCount / totalRight);
-            localRightOtherPercent = 100 * (rightOtherCount / totalRight);
+            localRightFatPercent = 100 * (localRightFat / totalRight);
+            localRightMusclePercent = 100 * (localRightMuscle / totalRight);
+            localRightOtherPercent = 100 * (localRightOther / totalRight);
             
-            totalFatPercent = 100 * ((leftFatCount + rightFatCount) / totalBoth);
-            totalMusclePercent = 100 * ((leftMuscleCount + rightMuscleCount) / totalBoth);
-            totalOtherPercent = 100 * ((leftOtherCount + rightOtherCount) / totalBoth);
+            totalFatPercent = 100 * ((localLeftFat + localRightFat) / totalBoth);
+            totalMusclePercent = 100 * ((localLeftMuscle + localRightMuscle) / totalBoth);
+            totalOtherPercent = 100 * ((localLeftOther + localRightOther) / totalBoth);
             
             % put it all in structs
             leftCsa = struct('fat',leftFatCsa,'muscle',leftMuscleCsa,'other',leftOtherCsa);
@@ -221,18 +217,21 @@ classdef FamSamFile < File
         function [roiMasks] = getRoiMasks(file, image)
             dims = size(image);
             
-            numRoi = file.numRoi;           
+            numRoi = currentFile.numRoi;           
             
             meanRoiX = zeros(numRoi, 1);
             roiMasks = cell(numRoi,1);                       
             
             for i=1:numRoi
+                
                 %calculate spline
                 
-                localRoiPoints = [file.roiPoints{i}; file.roiPoints{i}(1,:)]; %duplicate last point
+                localRoiPoints = file.roiPoints{i};
                 
                 meanRoiX(i) = mean(localRoiPoints(:,1));
-                                
+                
+                localRoiPoints = [localRoiPoints; localRoiPoints(1,:)]; %duplicate last point
+                
                 x = localRoiPoints(:,1)';
                 y = localRoiPoints(:,2)';
                 
@@ -249,7 +248,6 @@ classdef FamSamFile < File
             [~,I] = sort(meanRoiX);
                     
             roiMasks = roiMasks(I); %sort them from left to right
-        end
     end
     
 end

@@ -4,7 +4,7 @@ function [ handles ] = drawImage( currentFile, handles, varargin)
 % saveZoom optional: default is false (only needed when imageHandle is
 % empty (aka when image was deleted and now is being redrawn)
 
-image = currentFile.getCurrentImage(); %either highlighted or not
+image = currentFile.getCurrentImage(handles.currentImage); %either highlighted or not
 
 axesHandle = handles.imageAxes;
 

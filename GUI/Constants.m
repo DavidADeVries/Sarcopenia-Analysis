@@ -3,13 +3,13 @@ classdef Constants
     
     properties (Constant = true)
         % for dev
-        GIANT_PATH = '/data/projects/General Image Analysis Toolkit/metadata/';
+        GIANT_PATH = '/data/projects/General Image Analysis Toolkit/GIANT/metadata/';
         
         % for released
-        %GIANT_PATH = '/data/projects/General Image Analysis Toolkit/Current Release/';
+        %GIANT_PATH = '/data/projects/General Image Analysis Toolkit/Current Release/metadata/';
         
-        
-        
+        CLUSTER_MAP_TAGS = struct('fat',1,'muscle',2,'other',3);
+        HIGHLIGHT_TRANSPARENCY = 0.9; %range: 0 - 1
         
         SAVED_PATIENTS_DIRECTORY = '/data/projects/Sarcopenia/Sarcopenia Study/Saved Patient Analysis/'; %make sure it's absolute and ends with '/'
         RAW_DATA_DIRECTORY = '/data/projects/Sarcopenia/Sarcopenia Study/Raw Data/';

@@ -1,4 +1,4 @@
-function varargout = Sarcopenia_Analysis(varargin)
+function varargout = FAM_SAM(varargin)
 
 % add needed librarys
 
@@ -8,28 +8,28 @@ addpath(genpath(strcat(Constants.GIANT_PATH, 'GIANT Code')));
 addpath(strcat(Constants.GIANT_PATH, 'Common Module Functions/Quick Measure'));
 addpath(strcat(Constants.GIANT_PATH,'Common Module Functions/Plot Impoint'));
 
-% SARCOPENIA_ANALYSIS MATLAB code for Sarcopenia_Analysis.fig
-%      SARCOPENIA_ANALYSIS, by itself, creates a new SARCOPENIA_ANALYSIS or raises the existing
+% FAM_SAM MATLAB code for FAM_SAM.fig
+%      FAM_SAM, by itself, creates a new FAM_SAM or raises the existing
 %      singleton*.
 %
-%      H = SARCOPENIA_ANALYSIS returns the handle to a new SARCOPENIA_ANALYSIS or the handle to
+%      H = FAM_SAM returns the handle to a new FAM_SAM or the handle to
 %      the existing singleton*.
 %
-%      SARCOPENIA_ANALYSIS('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in SARCOPENIA_ANALYSIS.M with the given input arguments.
+%      FAM_SAM('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in FAM_SAM.M with the given input arguments.
 %
-%      SARCOPENIA_ANALYSIS('Property','Value',...) creates a new SARCOPENIA_ANALYSIS or raises the
+%      FAM_SAM('Property','Value',...) creates a new FAM_SAM or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before Sarcopenia_Analysis_OpeningFcn gets called.  An
+%      applied to the GUI before FAM_SAM_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to Sarcopenia_Analysis_OpeningFcn via varargin.
+%      stop.  All inputs are passed to FAM_SAM_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help Sarcopenia_Analysis
+% Edit the above text to modify the response to help FAM_SAM
 
 % Last Modified by GUIDE v2.5 08-Jul-2015 10:55:25
 
@@ -37,8 +37,8 @@ addpath(strcat(Constants.GIANT_PATH,'Common Module Functions/Plot Impoint'));
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
     'gui_Singleton',  gui_Singleton, ...
-    'gui_OpeningFcn', @Sarcopenia_Analysis_OpeningFcn, ...
-    'gui_OutputFcn',  @Sarcopenia_Analysis_OutputFcn, ...
+    'gui_OpeningFcn', @FAM_SAM_OpeningFcn, ...
+    'gui_OutputFcn',  @FAM_SAM_OutputFcn, ...
     'gui_LayoutFcn',  [] , ...
     'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -53,27 +53,27 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before Sarcopenia_Analysis is made visible.
-function Sarcopenia_Analysis_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before FAM_SAM is made visible.
+function FAM_SAM_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to Sarcopenia_Analysis (see VARARGIN)
+% varargin   command line arguments to FAM_SAM (see VARARGIN)
 
-% Choose default command line output for Sarcopenia_Analysis
+% Choose default command line output for FAM_SAM
 handles.deleteRoiOn = false;
 set(hObject, 'Pointer', 'arrow');
 
 giantOpeningFcn(hObject, handles);
 
 
-% UIWAIT makes Sarcopenia_Analysis wait for user response (see UIRESUME)
+% UIWAIT makes FAM_SAM wait for user response (see UIRESUME)
 % uiwait(handles.mainPanel);
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = Sarcopenia_Analysis_OutputFcn(hObject, eventdata, handles)
+function varargout = FAM_SAM_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -119,7 +119,7 @@ function closeAllPatients_ClickedCallback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-giantCloseAllPatient(hObject, handles);
+giantCloseAllPatients(hObject, handles);
 
 % % % % --------------------------------------------------------------------
 % % % function undo_ClickedCallback(hObject, eventdata, handles) %#ok<*DEFNU>
@@ -803,46 +803,17 @@ currentFile = getCurrentFile(handles);
 
 numRoi = currentFile.numRoi;
 
-if numRoi == 1 || numRoi == 2 %need left and right ROIs, no more, no less
+if numRoi == 1 || numRoi == 2 %need left and/or right ROIs, no more, no less
     
-    image = currentFile.image;
+    image = handles.currentImage;
     dims = size(image);
     
-    mask = zeros(dims);
+    roiMasks = currentFile.getRoiMasks(image);
     
-    meanRoiX = zeros(numRoi, 1);
-    roiMaskVecs = cell(numRoi,1);
+    leftRoiMask = roiMasks{1};
+    rightRoiMask = roiMasks{numRoi};
     
-    for i=1:numRoi
-        
-        %calculate spline
-        
-        roiPoints = currentFile.roiPoints{i};
-        
-        meanRoiX(i) = mean(roiPoints(:,1));
-        
-        roiPoints = [roiPoints; roiPoints(1,:)]; %duplicate last point
-        
-        x = roiPoints(:,1)';
-        y = roiPoints(:,2)';
-        
-        spline = cscvn([x;y]); %spline store as a function
-        
-        %plot spline
-        splinePoints = fnplt(spline)';
-        
-        roiMask = fastMask(splinePoints, dims);
-        
-        roiMaskVecs{i} = roiMask;
-        
-        mask = mask | roiMask;
-        
-    end
-    
-    [~,I] = sort(meanRoiX);
-    
-    leftRoiIndex = I(1);
-    rightRoiIndex = I(numRoi);
+    mask = leftRoiMask | rightRoiMask;
     
     %get data for kmeans
     
@@ -852,9 +823,9 @@ if numRoi == 1 || numRoi == 2 %need left and right ROIs, no more, no less
     maskIndices = (maskVec == 1); %returns all indices in the mask where the value is 1
     maskedImageVec = imageVec(maskIndices);
     
-    numClusters = 3;
+    [sortedClusterIndices] = performClusterAnalysis5(maskedImageVec); % low to high intensities returned; 2 clusters
     
-    [sortedClusterIndices] = performClusterAnalysis2(maskedImageVec);%performClusterAnalysis3(maskVec, imageVec, numClusters);%performClusterAnalysis(maskedImageVec, numClusters); % low to high intensities
+    numClusters = 2;
     
     clusterHighlighting = cell(numClusters,1);
     clusterMaskVecs = cell(numClusters,1);
@@ -877,69 +848,18 @@ if numRoi == 1 || numRoi == 2 %need left and right ROIs, no more, no less
         %clusterHighlighting{i} = reshape(sortedClusterIndices{i}, dims(1), dims(2));
     end
     
-    normedImage = image/max(max(image));
+    clusterMap = zeros(dims);
     
-    resultRedChan = zeros(dims(1),dims(2));
-    resultGreenChan = zeros(dims(1),dims(2));
-    resultBlueChan = zeros(dims(1),dims(2));
+    clusterTags = Constants.CLUSTER_MAP_TAGS;
     
-    for i=1:dims(1)
-        for j=1:dims(2)
-            if clusterHighlighting{1}(i,j)
-                resultRedChan(i,j) = 1;
-            else
-                resultRedChan(i,j) = normedImage(i,j);
-            end
-            
-            if clusterHighlighting{2}(i,j)
-                resultGreenChan(i,j) = 1;
-            else
-                resultGreenChan(i,j) = normedImage(i,j);
-            end
-            
-            if clusterHighlighting{3}(i,j)
-                resultBlueChan(i,j) = 1;
-            else
-                resultBlueChan(i,j) = normedImage(i,j);
-            end
-            
-        end
+    tagList = [clusterTags.muscle, clusterTags.fat]; %ordered from low to high intensity
+    
+    for i=1:numClusters
+        clusterMap = clusterMap + tagList(i)*clusterHighlighting{i};
     end
     
-    resultImage = zeros(dims(1), dims(2), 3);
-    
-    resultImage(:,:,1) = resultRedChan;
-    resultImage(:,:,2) = resultGreenChan;
-    resultImage(:,:,3) = resultBlueChan;
-    
-    currentFile.highlightedImage = resultImage;
+    currentFile.clusterMap = clusterMap;
     currentFile.highlightingOn = true;
-    
-    pixelCounts = cell(numRoi,1);
-    
-    % get pixel counts
-    for i=1:numRoi
-        pixelCount = zeros(numClusters, 1);
-        
-        for j=1:numClusters
-            pixelCount(j) = sum(clusterMaskVecs{j}(roiMaskVecs{i} == 1));
-        end
-        
-        pixelCounts{i} = pixelCount;
-    end
-    
-    leftPixelCount = pixelCounts{leftRoiIndex};
-    rightPixelCount = pixelCounts{rightRoiIndex};
-    
-    if numRoi == 1 %get rid of right pixel counts
-        rightPixelCount = zeros(numClusters, 1);
-    end
-    
-    finalPixelCounts = PixelCounts(...
-        leftPixelCount(1), leftPixelCount(2), leftPixelCount(3),...
-        rightPixelCount(1), rightPixelCount(2), rightPixelCount(3));
-    
-    currentFile.pixelCounts = finalPixelCounts;
         
     % finalize changes
     updateUndo = true;
@@ -1124,8 +1044,6 @@ currentFile = getCurrentFile(handles);
 switch newValue
     case 'unitNone'
         currentFile.displayUnits = 'none';
-    case 'unitRelative'
-        currentFile.displayUnits = 'relative';
     case 'unitAbsolute'
         currentFile.displayUnits = 'absolute';
     case 'unitPixel'

@@ -9,7 +9,7 @@ handles.updateUndoCache = true; %make sure the undo updater is waiting on click 
 currentFile = getCurrentFile(handles);
 
 %create map of ROIs
-dims = size(currentFile.image);
+dims = size(handles.currentImage);
 map = zeros(dims);
 
 for i=1:currentFile.numRoi
