@@ -33,7 +33,6 @@ classdef CacheEntry
             file.fatHighlightOn = cacheEntry.fatHighlightOn;
             file.muscleHighlightOn = cacheEntry.muscleHighlightOn;
             file.quickMeasureOn = cacheEntry.quickMeasureOn;
-            file.muscleLowerThreshold = cacheEntry.muscleLowerThreshold;
             file.roiPoints = cacheEntry.roiPoints;
             file.quickMeasurePoints = cacheEntry.quickMeasurePoints;
         end

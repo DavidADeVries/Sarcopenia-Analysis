@@ -39,8 +39,11 @@ if ~isempty(currentFile) %add in module file operations
     
     %analysis highlighting
     if ~isempty(currentFile.clusterMap)
-        set(handles.toggleHighlighting, 'Enable', 'on');
-        set(handles.menuToggleHighlighting, 'Enable', 'on');
+        set(handles.toggleFatHighlighting, 'Enable', 'on');
+        set(handles.toggleMuscleHighlighting, 'Enable', 'on');
+        
+        set(handles.menuToggleFatHighlighting, 'Enable', 'on');
+        set(handles.menuToggleMuscleHighlighting, 'Enable', 'on');
         
         % allow trimming        
         set(handles.trimFat, 'Enable', 'on');
@@ -50,9 +53,14 @@ if ~isempty(currentFile) %add in module file operations
         set(handles.menuTrimMuscle, 'Enable', 'on');
     end
     
-    if currentFile.highlightingOn
-        set(handles.toggleHighlighting, 'State', 'on');
-        set(handles.menuToggleHighlighting, 'Checked', 'on');
+    if currentFile.fatHighlightOn
+        set(handles.toggleFatHighlighting, 'State', 'on');
+        set(handles.menuToggleFatHighlighting, 'Checked', 'on');
+    end
+    
+    if currentFile.muscleHighlightOn
+        set(handles.toggleMuscleHighlighting, 'State', 'on');
+        set(handles.menuToggleMuscleHighlighting, 'Checked', 'on');
     end
     
     % delete roi

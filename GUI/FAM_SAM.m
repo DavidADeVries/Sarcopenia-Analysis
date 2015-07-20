@@ -31,7 +31,7 @@ addpath(strcat(Constants.GIANT_PATH,'Common Module Functions/Plot Impoint'));
 
 % Edit the above text to modify the response to help FAM_SAM
 
-% Last Modified by GUIDE v2.5 08-Jul-2015 10:55:25
+% Last Modified by GUIDE v2.5 20-Jul-2015 14:18:48
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -158,8 +158,7 @@ saveZoom = true; % preserves current zoom state
 handles = deleteAll(handles);
 handles = drawAll(currentFile, handles, hObject, saveZoom);
 
-updateToggleButtons(handles);
-updateUnitPanel(currentFile, handles);
+updateGui(currentFile, handles);
 
 % push up the changes
 guidata(hObject, handles);
@@ -185,8 +184,7 @@ saveZoom = true; % preserves current zoom state
 handles = deleteAll(handles);
 handles = drawAll(currentFile, handles, hObject, saveZoom);
 
-updateToggleButtons(handles);
-updateUnitPanel(currentFile, handles);
+updateGui(currentFile, handles);
 
 % push up the changes
 guidata(hObject, handles);
@@ -698,12 +696,12 @@ function menuToggleRoi_Callback(hObject, eventdata, handles)
 toggleRoi_ClickedCallback(hObject, eventdata, handles);
 
 % --------------------------------------------------------------------
-function menuToggleHighlighting_Callback(hObject, eventdata, handles)
-% hObject    handle to menuToggleHighlighting (see GCBO)
+function menuToggleFatHighlighting_Callback(hObject, eventdata, handles)
+% hObject    handle to menuToggleFatHighlighting (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-toggleHighlighting_ClickedCallback(hObject, eventdata, handles)
+toggleFatHighlighting_ClickedCallback(hObject, eventdata, handles)
 
 
 % --------------------------------------------------------------------
@@ -859,7 +857,8 @@ if numRoi == 1 || numRoi == 2 %need left and/or right ROIs, no more, no less
     end
     
     currentFile.clusterMap = clusterMap;
-    currentFile.highlightingOn = true;
+    currentFile.fatHighlightOn = true;
+    currentFile.muscleHighlightOn = true;
         
     % finalize changes
     updateUndo = true;
@@ -880,14 +879,14 @@ end
 
 
 % --------------------------------------------------------------------
-function toggleHighlighting_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to toggleHighlighting (see GCBO)
+function toggleFatHighlighting_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to toggleFatHighlighting (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 currentFile = getCurrentFile(handles);
 
-currentFile.highlightingOn = ~currentFile.highlightingOn;
+currentFile.fatHighlightOn = ~currentFile.fatHighlightOn;
 
 % finalize changes
 updateUndo = false;
@@ -1071,3 +1070,115 @@ function imageAxes_ButtonDownFcn(hObject, eventdata, handles)
 % hObject    handle to imageAxes (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function trimFat_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to trimFat (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+currentFile = getCurrentFile(handles);
+
+clusterMap = currentFile.clusterMap;
+
+if ~isempty(clusterMap)
+    clusterTags = Constants.CLUSTER_MAP_TAGS;
+    
+    toFillMask = (clusterMap == clusterTags.muscle); %have a mask where background, 'other', AND fat are 0's, rest is 1's
+    
+    filledMask = imfill(toFillMask, 'holes'); %fills in all groups of 0 pixels that can't be reached from the background (aka, fat on the inside)
+    
+    diffMask = filledMask - toFillMask; %now a mask of only the pixels that were filled in last step, aka the interior fat pixels.
+    
+    fatMask = (clusterMap == clusterTags.fat);
+    
+    lowIntMuscleMask = (clusterMap == clusterTags.lowIntMuscle);
+    
+    exteriorFatMask = (fatMask - (diffMask & ~lowIntMuscleMask)); %don't want any low intensity muscle that was trimmed to get in   
+    
+    trimmedClusterMap = clusterMap + (exteriorFatMask * (clusterTags.other - clusterTags.fat));
+    
+    currentFile.clusterMap = trimmedClusterMap;
+end
+
+% finalize changes
+updateUndo = true;
+pendingChanges = true;
+
+handles = updateFile(currentFile, updateUndo, pendingChanges, handles);
+
+% update display
+handles = drawImage(currentFile, handles);
+
+updateTissueAnalysisTable(currentFile, handles);
+
+% push up the changes
+guidata(hObject, handles);
+
+% --------------------------------------------------------------------
+function trimMuscle_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to trimMuscle (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+currentFile = getCurrentFile(handles);
+
+clusterMap = currentFile.clusterMap;
+
+if ~isempty(clusterMap)
+    threshold = muscleThresholdPopup(hObject);
+    
+    if ~isempty(threshold) %user didn't click 'Cancel'
+        currentFile = currentFile.setMuscleLowerThreshold(handles.currentImage, threshold);
+        
+        % finalize changes
+        updateUndo = true;
+        pendingChanges = true;
+        
+        handles = updateFile(currentFile, updateUndo, pendingChanges, handles);
+    end
+        
+    % update display
+    % update for either case because doing the thresholding selection
+    % changes the displayed image
+    handles = drawImage(currentFile, handles);
+    
+    updateTissueAnalysisTable(currentFile, handles);    
+    
+    % push up the changes
+    guidata(hObject, handles);
+end
+
+
+% --------------------------------------------------------------------
+function toggleMuscleHighlighting_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to toggleMuscleHighlighting (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+currentFile = getCurrentFile(handles);
+
+currentFile.muscleHighlightOn = ~currentFile.muscleHighlightOn;
+
+% finalize changes
+updateUndo = false;
+pendingChanges = true;
+
+handles = updateFile(currentFile, updateUndo, pendingChanges, handles);
+
+% update display
+handles = drawImage(currentFile, handles);
+
+updateToggleButtons(handles);
+
+% push up the changes
+guidata(hObject, handles);
+
+% --------------------------------------------------------------------
+function menuToggleMuscleHighlighting_Callback(hObject, eventdata, handles)
+% hObject    handle to menuToggleMuscleHighlighting (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+toggleMuscleHighlighting_ClickedCallback(hObject, eventdata, handles);

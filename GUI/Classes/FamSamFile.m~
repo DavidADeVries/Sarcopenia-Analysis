@@ -5,13 +5,13 @@ classdef FamSamFile < File
         clusterMap = []; %same size as image, where each number is a cluster: 1-fat, 2-muscle, 3-other
         
         roiOn = false;
-        highlightingOn = false;
+        fatHighlightOn = false;
+        muscleHighlightOn = false;
         quickMeasureOn = false;
         displayUnits = ''; %can be: none, absolute, relative, pixel
         
         roiPoints = cell(0);        
         quickMeasurePoints = [];
-        pixelCounts = PixelCounts.empty; %stores the number of pixel of each intensity for each ROI
     end
     
     methods
@@ -22,7 +22,7 @@ classdef FamSamFile < File
         
         %% getCurrentImage %%
         function image = getCurrentImage(file, image)
-            if file.highlightingOn
+            if file.fatHighlightOn || file.muscleHighlightOn
                 image = file.getHighlightedImage(image);
             end
         end
@@ -45,13 +45,13 @@ classdef FamSamFile < File
             
             for i=1:dims(1)
                 for j=1:dims(2)      
-                    if localClusterMap(i,j) == clusterTags.fat %fat green
+                    if localClusterMap(i,j) == clusterTags.fat && file.fatHighlightOn %fat green
                         highlightGreenChan(i,j) = transparency;
                     else
                         highlightGreenChan(i,j) = normedImage(i,j);
                     end
                     
-                    if localClusterMap(i,j) == clusterTags.muscle %muscle red
+                    if localClusterMap(i,j) == clusterTags.muscle && file.muscleHighlightOn %muscle red
                         highlightRedChan(i,j) = transparency;
                     else
                         highlightRedChan(i,j) = normedImage(i,j);
@@ -144,59 +144,64 @@ classdef FamSamFile < File
          %% getStats %%
         function [csas, percentages] = getStats(file, image)
             pixelArea = file.getPixelArea();
+            clusterTags = Constants.CLUSTER_MAP_TAGS;
             
             % count up number of pixels for ROIs
             
             roiMasks = file.getRoiMasks(image);
             
-            leftRoiMask = roiMasks(1);
-            rightRoiMask = roiMasks(file.numRoi);
+            leftRoiMask = roiMasks{1};
+            
+            if file.numRoi == 1
+                rightRoiMask = []; % kept empty, or else left and right ROI will be the same
+            else
+                rightRoiMask = roiMasks{file.numRoi};
+            end
             
             localClusterMap = file.clusterMap;
             
-            leftClusterMap = localClusterMap(leftRoiMask);
-            rightClusterMap = localClusterMap(rightRoiMask);
+            leftClusterMap = localClusterMap(leftRoiMask==1);
+            rightClusterMap = localClusterMap(rightRoiMask==1);
             
+            leftFatCount = sum(leftClusterMap == clusterTags.fat);
+            leftMuscleCount = sum(leftClusterMap == clusterTags.muscle);
+            leftOtherCount = sum(leftClusterMap == clusterTags.other);
             
-            localLeftFat = pixelCounts.leftFat;
-            localLeftMuscle = pixelCounts.localLeftMuscleuscle;
-            localLeftOther = pixelCounts.leftOther;
-            
-            localRightFat = pixelCounts.rightFat;
-            localRightMuscle = pixelCounts.localRightMuscleuscle;
-            localRightOther = pixelCounts.rightOther;
-            
-            totalLeft = sum([localLeftFat, localLeftMuscle, localLeftOther]);
-            totalRight = sum([localRightFat, localRightMuscle, localRightOther]);
+            rightFatCount = sum(rightClusterMap == clusterTags.fat);
+            rightMuscleCount = sum(rightClusterMap == clusterTags.muscle);
+            rightOtherCount = sum(rightClusterMap == clusterTags.other);
+                        
+            totalLeft = sum([leftFatCount, leftMuscleCount, leftOtherCount]);
+            totalRight = sum([rightFatCount, rightMuscleCount, rightOtherCount]);
             totalBoth = totalLeft + totalRight;
             
             % figure out CSAs and percentages
             
             % cross sectional areas (CSA)
-            leftFatCsa = localLeftFat * pixelArea;
-            leftMuscleCsa = localLeftMuscle * pixelArea;
-            leftOtherCsa = localLeftOther * pixelArea;
+            leftFatCsa = leftFatCount * pixelArea;
+            leftMuscleCsa = leftMuscleCount * pixelArea;
+            leftOtherCsa = leftOtherCount * pixelArea;
             
-            rightFatCsa = localRightFat * pixelArea;
-            rightMuscleCsa = localRightMuscle * pixelArea;
-            rightOtherCsa = localRightOther * pixelArea;
+            rightFatCsa = rightFatCount * pixelArea;
+            rightMuscleCsa = rightMuscleCount * pixelArea;
+            rightOtherCsa = rightOtherCount * pixelArea;
             
-            totalFatCsa = (localLeftFat + localRightFat) * pixelArea;
-            totalMuscleCsa = (localLeftMuscle + localRightMuscle) * pixelArea;
-            totalOtherCsa = (localLeftOther + localRightOther) * pixelArea;
+            totalFatCsa = (leftFatCount + rightFatCount) * pixelArea;
+            totalMuscleCsa = (leftMuscleCount + rightMuscleCount) * pixelArea;
+            totalOtherCsa = (leftOtherCount + rightOtherCount) * pixelArea;
             
             % percentages
-            localLeftFatPercent = 100 * (localLeftFat / totalLeft);
-            localLeftMusclePercent = 100 * (localLeftMuscle / totalLeft);
-            localLeftOtherPercent = 100 * (localLeftOther / totalLeft);
+            localLeftFatPercent = 100 * (leftFatCount / totalLeft);
+            localLeftMusclePercent = 100 * (leftMuscleCount / totalLeft);
+            localLeftOtherPercent = 100 * (leftOtherCount / totalLeft);
             
-            localRightFatPercent = 100 * (localRightFat / totalRight);
-            localRightMusclePercent = 100 * (localRightMuscle / totalRight);
-            localRightOtherPercent = 100 * (localRightOther / totalRight);
+            localRightFatPercent = 100 * (rightFatCount / totalRight);
+            localRightMusclePercent = 100 * (rightMuscleCount / totalRight);
+            localRightOtherPercent = 100 * (rightOtherCount / totalRight);
             
-            totalFatPercent = 100 * ((localLeftFat + localRightFat) / totalBoth);
-            totalMusclePercent = 100 * ((localLeftMuscle + localRightMuscle) / totalBoth);
-            totalOtherPercent = 100 * ((localLeftOther + localRightOther) / totalBoth);
+            totalFatPercent = 100 * ((leftFatCount + rightFatCount) / totalBoth);
+            totalMusclePercent = 100 * ((leftMuscleCount + rightMuscleCount) / totalBoth);
+            totalOtherPercent = 100 * ((leftOtherCount + rightOtherCount) / totalBoth);
             
             % put it all in structs
             leftCsa = struct('fat',leftFatCsa,'muscle',leftMuscleCsa,'other',leftOtherCsa);
@@ -217,21 +222,18 @@ classdef FamSamFile < File
         function [roiMasks] = getRoiMasks(file, image)
             dims = size(image);
             
-            numRoi = currentFile.numRoi;           
+            numRoi = file.numRoi;           
             
             meanRoiX = zeros(numRoi, 1);
             roiMasks = cell(numRoi,1);                       
             
             for i=1:numRoi
-                
                 %calculate spline
                 
-                localRoiPoints = file.roiPoints{i};
+                localRoiPoints = [file.roiPoints{i}; file.roiPoints{i}(1,:)]; %duplicate last point
                 
                 meanRoiX(i) = mean(localRoiPoints(:,1));
-                
-                localRoiPoints = [localRoiPoints; localRoiPoints(1,:)]; %duplicate last point
-                
+                                
                 x = localRoiPoints(:,1)';
                 y = localRoiPoints(:,2)';
                 
@@ -248,6 +250,25 @@ classdef FamSamFile < File
             [~,I] = sort(meanRoiX);
                     
             roiMasks = roiMasks(I); %sort them from left to right
+        end
+        
+        %% setLowerMuscleThreshold %%
+        function file = setLowerMuscleThreshold(file, image, lowerThreshold)
+            % set all pixels tagged as muscle that are below the threshold
+            % to be 'other'
+            clusterTags = Constants.CLUSTER_MAP_TAGS;
+            localClusterMap = file.clusterMap;
+            
+            allMuscleMask = (localClusterMap == clusterTags.muscle) | (localClusterMap == clusterTags.lowIntMuscle);
+                        
+            newLowMuscleMask = allMuscleMask & (image < lowerThreshold);
+            
+            clusterMapWithoutMuscle = 
+            
+            newClusterMap = localClusterMap + newLowMuscleMask*(clusterTags.lowIntMuscle - clusterTags.muscle);
+            
+            file.clusterMap = newClusterMap;   
+        end
     end
     
 end

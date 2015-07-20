@@ -2,12 +2,14 @@ classdef FamSamFile < File
     %file represents an open DICOM file
     
     properties
-        clusterMap = []; %same size as image, where each number is a cluster: 1-fat, 2-muscle, 3-other
+        clusterMap = []; %same size as image, where each number is a cluster, given by Constants.CLUSTER_MAP_TAGS
         
         roiOn = false;
-        highlightingOn = false;
+        fatHighlightOn = false;
+        muscleHighlightOn = false;
         quickMeasureOn = false;
-        displayUnits = ''; %can be: none, absolute, relative, pixel
+        muscleLowerThreshold = []; % used to reject tissue that was segmented as muscle, but is too dark.
+        displayUnits = ''; %can be: none, relative, pixel
         
         roiPoints = cell(0);        
         quickMeasurePoints = [];
@@ -21,7 +23,7 @@ classdef FamSamFile < File
         
         %% getCurrentImage %%
         function image = getCurrentImage(file, image)
-            if file.highlightingOn
+            if file.fatHighlightOn || file.muscleHighlightOn
                 image = file.getHighlightedImage(image);
             end
         end
@@ -44,13 +46,13 @@ classdef FamSamFile < File
             
             for i=1:dims(1)
                 for j=1:dims(2)      
-                    if localClusterMap(i,j) == clusterTags.fat %fat green
+                    if localClusterMap(i,j) == clusterTags.fat && file.fatHighlightOn %fat green
                         highlightGreenChan(i,j) = transparency;
                     else
                         highlightGreenChan(i,j) = normedImage(i,j);
                     end
                     
-                    if localClusterMap(i,j) == clusterTags.muscle %muscle red
+                    if localClusterMap(i,j) == clusterTags.muscle && file.muscleHighlightOn %muscle red
                         highlightRedChan(i,j) = transparency;
                     else
                         highlightRedChan(i,j) = normedImage(i,j);
@@ -175,7 +177,6 @@ classdef FamSamFile < File
             totalBoth = totalLeft + totalRight;
             
             % figure out CSAs and percentages
-            
             % cross sectional areas (CSA)
             leftFatCsa = leftFatCount * pixelArea;
             leftMuscleCsa = leftMuscleCount * pixelArea;
@@ -249,6 +250,27 @@ classdef FamSamFile < File
             [~,I] = sort(meanRoiX);
                     
             roiMasks = roiMasks(I); %sort them from left to right
+        end
+        
+        %% setLowerMuscleThreshold %%
+        function file = setMuscleLowerThreshold(file, image, lowerThreshold)
+            % set all pixels tagged as muscle that are below the threshold
+            % to be 'other'
+                       
+            clusterTags = Constants.CLUSTER_MAP_TAGS;
+            localClusterMap = file.clusterMap;
+            
+            lowIntMuscleMask = (localClusterMap == clusterTags.lowIntMuscle);
+            allMuscleMask = (localClusterMap == clusterTags.muscle) | lowIntMuscleMask;
+                        
+            newLowIntMuscleMask = allMuscleMask & (image < lowerThreshold);
+            
+            clusterMapWithoutLowIntMuscle = localClusterMap + lowIntMuscleMask*(clusterTags.muscle - clusterTags.lowIntMuscle);
+            
+            newClusterMap = clusterMapWithoutLowIntMuscle + newLowIntMuscleMask*(clusterTags.lowIntMuscle - clusterTags.muscle);
+            
+            file.clusterMap = newClusterMap;   
+            file.muscleLowerThreshold = lowerThreshold;
         end
     end
     

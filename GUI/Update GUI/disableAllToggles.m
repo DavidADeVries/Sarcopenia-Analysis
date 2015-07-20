@@ -24,11 +24,13 @@ set(handles.quickMeasure, 'Enable', 'off');
 set(handles.deleteRoi, 'State', 'off');
 
 set(handles.toggleRoi, 'Enable', 'off');
-set(handles.toggleHighlighting, 'Enable', 'off');
+set(handles.toggleFatHighlighting, 'Enable', 'off');
+set(handles.toggleMuscleHighlighting, 'Enable', 'off');
 set(handles.toggleQuickMeasure, 'Enable', 'off');
 
 set(handles.toggleRoi, 'State', 'off');
-set(handles.toggleHighlighting, 'State', 'off');
+set(handles.toggleFatHighlighting, 'State', 'off');
+set(handles.toggleMuscleHighlighting, 'State', 'off');
 set(handles.toggleQuickMeasure, 'State', 'off');
 
 % don't even want to see these ones
@@ -47,11 +49,13 @@ set(handles.menuQuickMeasure, 'Enable', 'off');
 set(handles.menuDeleteRoi, 'Checked', 'off');
 
 set(handles.menuToggleRoi, 'Enable', 'off');
-set(handles.menuToggleHighlighting, 'Enable', 'off');
+set(handles.menuToggleFatHighlighting, 'Enable', 'off');
+set(handles.menuToggleMuscleHighlighting, 'Enable', 'off');
 set(handles.menuToggleQuickMeasure, 'Enable', 'off');
 
 set(handles.menuToggleRoi, 'Checked', 'off');
-set(handles.menuToggleHighlighting, 'Checked', 'off');
+set(handles.menuToggleFatHighlighting, 'Checked', 'off');
+set(handles.menuToggleMuscleHighlighting, 'Checked', 'off');
 set(handles.menuToggleQuickMeasure, 'Checked', 'off');
 
 end
