@@ -17,8 +17,8 @@ set(handles.pan, 'State', 'off');
 set(handles.selectRoi, 'Enable', 'off');
 set(handles.deleteRoi, 'Enable', 'off');
 set(handles.performAnalysis, 'Enable', 'off');
+set(handles.setThresholds, 'Enable', 'off');
 set(handles.trimFat, 'Enable', 'off');
-set(handles.trimMuscle, 'Enable', 'off');
 set(handles.quickMeasure, 'Enable', 'off');
 
 set(handles.deleteRoi, 'State', 'off');
@@ -42,8 +42,8 @@ set(handles.generalDecline, 'Visible', 'off');
 set(handles.menuSelectRoi, 'Enable', 'off');
 set(handles.menuDeleteRoi, 'Enable', 'off');
 set(handles.menuPerformAnalysis, 'Enable', 'off');
+set(handles.menuSetThresholds, 'Enable', 'off');
 set(handles.menuTrimFat, 'Enable', 'off');
-set(handles.menuTrimMuscle, 'Enable', 'off');
 set(handles.menuQuickMeasure, 'Enable', 'off');
 
 set(handles.menuDeleteRoi, 'Checked', 'off');

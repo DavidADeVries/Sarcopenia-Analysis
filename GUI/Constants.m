@@ -8,7 +8,7 @@ classdef Constants
         % for released
         %GIANT_PATH = '/data/projects/General Image Analysis Toolkit/Current Release/metadata/';
         
-        CLUSTER_MAP_TAGS = struct('fat',1,'muscle',2,'lowIntMuscle',3,'other',4);
+        CLUSTER_MAP_TAGS = struct('belowMuscle',1,'muscle',2,'interMuscleFat',3,'fat',4,'aboveFat',5,'trimmedFat',6');
         HIGHLIGHT_TRANSPARENCY = 0.9; %range: 0 - 1
         
         SAVED_PATIENTS_DIRECTORY = '/data/projects/Sarcopenia/Sarcopenia Study/Saved Patient Analysis/'; %make sure it's absolute and ends with '/'

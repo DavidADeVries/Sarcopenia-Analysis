@@ -46,11 +46,11 @@ if ~isempty(currentFile) %add in module file operations
         set(handles.menuToggleMuscleHighlighting, 'Enable', 'on');
         
         % allow trimming        
+        set(handles.setThresholds, 'Enable', 'on');
         set(handles.trimFat, 'Enable', 'on');
-        set(handles.trimMuscle, 'Enable', 'on');
         
+        set(handles.menuSetThresholds, 'Enable', 'on');
         set(handles.menuTrimFat, 'Enable', 'on');
-        set(handles.menuTrimMuscle, 'Enable', 'on');
     end
     
     if currentFile.fatHighlightOn

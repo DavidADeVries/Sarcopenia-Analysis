@@ -31,7 +31,7 @@ addpath(strcat(Constants.GIANT_PATH,'Common Module Functions/Plot Impoint'));
 
 % Edit the above text to modify the response to help FAM_SAM
 
-% Last Modified by GUIDE v2.5 20-Jul-2015 14:18:48
+% Last Modified by GUIDE v2.5 21-Jul-2015 15:27:58
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -854,9 +854,31 @@ if numRoi == 1 || numRoi == 2 %need left and/or right ROIs, no more, no less
     
     for i=1:numClusters
         clusterMap = clusterMap + tagList(i)*clusterHighlighting{i};
+    end    
+    
+    muscleIntensities = image(clusterMap == clusterTags.muscle);
+    
+    minMuscle = min(muscleIntensities);
+    maxMuscle = max(muscleIntensities);
+    
+    fatIntensities = image(clusterMap == clusterTags.fat);
+    
+    minFat = min(fatIntensities);
+    maxFat = max(fatIntensities);
+    
+    if maxMuscle == minFat %just in case
+        maxMuscle = maxMuscle - 1;
     end
     
-    currentFile.clusterMap = clusterMap;
+    thresholds = struct(...
+        'muscleLower', minMuscle,...
+        'muscleUpper', maxMuscle,...
+        'fatLower', minFat,...
+        'fatUpper', maxFat);        
+    
+    currentFile.clusterMap = []; %reset
+    currentFile = currentFile.setThresholds(image, thresholds);
+    
     currentFile.fatHighlightOn = true;
     currentFile.muscleHighlightOn = true;
         
@@ -1085,7 +1107,7 @@ clusterMap = currentFile.clusterMap;
 if ~isempty(clusterMap)
     clusterTags = Constants.CLUSTER_MAP_TAGS;
     
-    toFillMask = (clusterMap == clusterTags.muscle); %have a mask where background, 'other', AND fat are 0's, rest is 1's
+    toFillMask = (clusterMap == clusterTags.muscle); %have a mask where muscle is 1's, rest is 0's
     
     filledMask = imfill(toFillMask, 'holes'); %fills in all groups of 0 pixels that can't be reached from the background (aka, fat on the inside)
     
@@ -1093,11 +1115,11 @@ if ~isempty(clusterMap)
     
     fatMask = (clusterMap == clusterTags.fat);
     
-    lowIntMuscleMask = (clusterMap == clusterTags.lowIntMuscle);
+    notFatOrMuscleMask = ~( (clusterMap == clusterTags.muscle) | (clusterMap == clusterTags.fat)) ;
     
-    exteriorFatMask = (fatMask - (diffMask & ~lowIntMuscleMask)); %don't want any low intensity muscle that was trimmed to get in   
+    exteriorFatMask = (fatMask - (diffMask & ~notFatOrMuscleMask)); %don't want any low intensity muscle that was trimmed to get in   
     
-    trimmedClusterMap = clusterMap + (exteriorFatMask * (clusterTags.other - clusterTags.fat));
+    trimmedClusterMap = clusterMap + (exteriorFatMask * (clusterTags.trimmedFat - clusterTags.fat));
     
     currentFile.clusterMap = trimmedClusterMap;
 end
@@ -1115,40 +1137,6 @@ updateTissueAnalysisTable(currentFile, handles);
 
 % push up the changes
 guidata(hObject, handles);
-
-% --------------------------------------------------------------------
-function trimMuscle_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to trimMuscle (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-currentFile = getCurrentFile(handles);
-
-clusterMap = currentFile.clusterMap;
-
-if ~isempty(clusterMap)
-    threshold = muscleThresholdPopup(hObject);
-    
-    if ~isempty(threshold) %user didn't click 'Cancel'
-        currentFile = currentFile.setMuscleLowerThreshold(handles.currentImage, threshold);
-        
-        % finalize changes
-        updateUndo = true;
-        pendingChanges = true;
-        
-        handles = updateFile(currentFile, updateUndo, pendingChanges, handles);
-    end
-        
-    % update display
-    % update for either case because doing the thresholding selection
-    % changes the displayed image
-    handles = drawImage(currentFile, handles);
-    
-    updateTissueAnalysisTable(currentFile, handles);    
-    
-    % push up the changes
-    guidata(hObject, handles);
-end
 
 
 % --------------------------------------------------------------------
@@ -1182,3 +1170,56 @@ function menuToggleMuscleHighlighting_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 toggleMuscleHighlighting_ClickedCallback(hObject, eventdata, handles);
+
+
+% --------------------------------------------------------------------
+function setThresholds_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to setThresholds (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+currentFile = getCurrentFile(handles);
+
+clusterMap = currentFile.clusterMap;
+
+if ~isempty(clusterMap)
+    updatedFile = histogramPopup(hObject);
+    
+    if ~isempty(updatedFile) %user didn't click 'Cancel'
+        currentFile = updatedFile;
+        
+        % finalize changes
+        updateUndo = true;
+        pendingChanges = true;
+        
+        handles = updateFile(currentFile, updateUndo, pendingChanges, handles);
+    end
+        
+    % update display
+    % update for either case because doing the thresholding selection
+    % changes the displayed image
+    handles = drawImage(currentFile, handles);
+    
+    updateTissueAnalysisTable(currentFile, handles);    
+    
+    % push up the changes
+    guidata(hObject, handles);
+end
+
+
+% --------------------------------------------------------------------
+function menuSetThresholds_Callback(hObject, eventdata, handles)
+% hObject    handle to menuSetThresholds (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+setThresholds_ClickedCallback(hObject, eventdata, handles);
+
+
+% --------------------------------------------------------------------
+function menuTrimFat_Callback(hObject, eventdata, handles)
+% hObject    handle to menuTrimFat (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+trimFat_ClickedCallback(hObject, eventdata, handles);

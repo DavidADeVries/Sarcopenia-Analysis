@@ -8,7 +8,9 @@ classdef FamSamFile < File
         fatHighlightOn = false;
         muscleHighlightOn = false;
         quickMeasureOn = false;
-        muscleLowerThreshold = []; % used to reject tissue that was segmented as muscle, but is too dark.
+        
+        thresholds; % structure containing 'muscleLower', 'muscleUpper', 'fatLower', 'fatUpper'. Usually 'muscleUpper' = 'fatLower'
+        
         displayUnits = ''; %can be: none, relative, pixel
         
         roiPoints = cell(0);        
@@ -166,53 +168,48 @@ classdef FamSamFile < File
             
             leftFatCount = sum(leftClusterMap == clusterTags.fat);
             leftMuscleCount = sum(leftClusterMap == clusterTags.muscle);
-            leftOtherCount = sum(leftClusterMap == clusterTags.other);
             
             rightFatCount = sum(rightClusterMap == clusterTags.fat);
             rightMuscleCount = sum(rightClusterMap == clusterTags.muscle);
-            rightOtherCount = sum(rightClusterMap == clusterTags.other);
                         
-            totalLeft = sum([leftFatCount, leftMuscleCount, leftOtherCount]);
-            totalRight = sum([rightFatCount, rightMuscleCount, rightOtherCount]);
-            totalBoth = totalLeft + totalRight;
+            leftAllCount = sum(leftClusterMap ~= 0);
+            rightAllCount = sum(rightClusterMap ~= 0);
+            totalAllCount = leftAllCount + rightAllCount;
             
             % figure out CSAs and percentages
             % cross sectional areas (CSA)
             leftFatCsa = leftFatCount * pixelArea;
             leftMuscleCsa = leftMuscleCount * pixelArea;
-            leftOtherCsa = leftOtherCount * pixelArea;
+            leftAllCsa = leftAllCount * pixelArea;
             
             rightFatCsa = rightFatCount * pixelArea;
             rightMuscleCsa = rightMuscleCount * pixelArea;
-            rightOtherCsa = rightOtherCount * pixelArea;
+            rightAllCsa = rightAllCount * pixelArea;
             
             totalFatCsa = (leftFatCount + rightFatCount) * pixelArea;
             totalMuscleCsa = (leftMuscleCount + rightMuscleCount) * pixelArea;
-            totalOtherCsa = (leftOtherCount + rightOtherCount) * pixelArea;
+            totalAllCsa = totalAllCount * pixelArea;
             
             % percentages
-            localLeftFatPercent = 100 * (leftFatCount / totalLeft);
-            localLeftMusclePercent = 100 * (leftMuscleCount / totalLeft);
-            localLeftOtherPercent = 100 * (leftOtherCount / totalLeft);
+            localLeftFatPercent = 100 * (leftFatCount / leftAllCount);
+            localLeftMusclePercent = 100 * (leftMuscleCount / leftAllCount);
             
-            localRightFatPercent = 100 * (rightFatCount / totalRight);
-            localRightMusclePercent = 100 * (rightMuscleCount / totalRight);
-            localRightOtherPercent = 100 * (rightOtherCount / totalRight);
+            localRightFatPercent = 100 * (rightFatCount / rightAllCount);
+            localRightMusclePercent = 100 * (rightMuscleCount / rightAllCount);
             
-            totalFatPercent = 100 * ((leftFatCount + rightFatCount) / totalBoth);
-            totalMusclePercent = 100 * ((leftMuscleCount + rightMuscleCount) / totalBoth);
-            totalOtherPercent = 100 * ((leftOtherCount + rightOtherCount) / totalBoth);
+            totalFatPercent = 100 * ((leftFatCount + rightFatCount) / totalAllCount);
+            totalMusclePercent = 100 * ((leftMuscleCount + rightMuscleCount) / totalAllCount);
             
             % put it all in structs
-            leftCsa = struct('fat',leftFatCsa,'muscle',leftMuscleCsa,'other',leftOtherCsa);
-            rightCsa = struct('fat',rightFatCsa,'muscle',rightMuscleCsa,'other',rightOtherCsa);
-            totalCsa = struct('fat',totalFatCsa,'muscle',totalMuscleCsa,'other',totalOtherCsa);
+            leftCsa = struct('fat',leftFatCsa,'muscle',leftMuscleCsa,'all',leftAllCsa);
+            rightCsa = struct('fat',rightFatCsa,'muscle',rightMuscleCsa,'all',rightAllCsa);
+            totalCsa = struct('fat',totalFatCsa,'muscle',totalMuscleCsa,'all',totalAllCsa);
             
             csas = struct('left',leftCsa,'right',rightCsa','total',totalCsa);
             
-            leftPercent = struct('fat',localLeftFatPercent,'muscle',localLeftMusclePercent,'other',localLeftOtherPercent);
-            rightPercent = struct('fat',localRightFatPercent,'muscle',localRightMusclePercent,'other',localRightOtherPercent);
-            totalPercent = struct('fat',totalFatPercent,'muscle',totalMusclePercent,'other',totalOtherPercent);
+            leftPercent = struct('fat',localLeftFatPercent,'muscle',localLeftMusclePercent);
+            rightPercent = struct('fat',localRightFatPercent,'muscle',localRightMusclePercent);
+            totalPercent = struct('fat',totalFatPercent,'muscle',totalMusclePercent);
             
             percentages = struct('left',leftPercent,'right',rightPercent','total',totalPercent);
         end
@@ -271,6 +268,52 @@ classdef FamSamFile < File
             
             file.clusterMap = newClusterMap;   
             file.muscleLowerThreshold = lowerThreshold;
+        end
+        
+        %% setThresholds
+        function file = setThresholds(file, image, thresholds)
+            
+            file.thresholds = thresholds;
+            
+            clusterTags = Constants.CLUSTER_MAP_TAGS;
+            
+            localClusterMap = file.clusterMap;
+            
+            if isempty(localClusterMap)
+                validMask = zeros(size(image));
+                
+                preserve = validMask;
+                
+                roiMasks = file.getRoiMasks(image);
+                
+                for i=1:length(roiMasks)
+                    validMask = validMask | roiMasks{i};
+                end
+            else
+                validMask = (localClusterMap ~= 0) & (localClusterMap ~= clusterTags.trimmedFat); %not allowed to touch outside of ROI or trimmed fat
+                
+                preserve = clusterTags.trimmedFat*(localClusterMap == clusterTags.trimmedFat);
+            end            
+            
+            belowMuscleMask = validMask & (image < thresholds.muscleLower);
+            
+            muscleMask = validMask & (image >= thresholds.muscleLower) & (image <= thresholds.muscleUpper);
+            
+            interMuscleFatMask = validMask & (image > thresholds.muscleUpper) & (image < thresholds.fatLower);
+            
+            fatMask = validMask & (image >= thresholds.fatLower) & (image <= thresholds.fatUpper);
+            
+            aboveFatMask = validMask & (image > thresholds.fatUpper);
+            
+            newClusterMap = ...
+                preserve... %preserve the trimmed fat
+                + clusterTags.belowMuscle*belowMuscleMask...
+                + clusterTags.muscle*muscleMask...
+                + clusterTags.interMuscleFat*interMuscleFatMask...
+                + clusterTags.fat*fatMask...
+                + clusterTags.aboveFat*aboveFatMask;
+            
+            file.clusterMap = newClusterMap;
         end
     end
     

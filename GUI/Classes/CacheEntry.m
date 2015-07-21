@@ -9,7 +9,7 @@ classdef CacheEntry
         muscleHighlightOn
         quickMeasureOn
         
-        muscleLowerThreshold
+        thresholds
         
         roiPoints
         quickMeasurePoints
@@ -22,7 +22,7 @@ classdef CacheEntry
             cacheEntry.fatHighlightOn = file.fatHighlightOn;
             cacheEntry.muscleHighlightOn = file.muscleHighlightOn;
             cacheEntry.quickMeasureOn = file.quickMeasureOn;
-            cacheEntry.muscleLowerThreshold = file.muscleLowerThreshold;
+            cacheEntry.thresholds = file.thresholds;
             cacheEntry.roiPoints = file.roiPoints;
             cacheEntry.quickMeasurePoints = file.quickMeasurePoints;
         end
@@ -33,7 +33,7 @@ classdef CacheEntry
             file.fatHighlightOn = cacheEntry.fatHighlightOn;
             file.muscleHighlightOn = cacheEntry.muscleHighlightOn;
             file.quickMeasureOn = cacheEntry.quickMeasureOn;
-            file.muscleLowerThreshold = cacheEntry.muscleLowerThreshold;
+            file.thresholds = cacheEntry.thresholds;
             file.roiPoints = cacheEntry.roiPoints;
             file.quickMeasurePoints = cacheEntry.quickMeasurePoints;
         end

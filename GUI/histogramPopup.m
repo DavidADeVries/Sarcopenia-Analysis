@@ -1,35 +1,35 @@
-function varargout = muscleThresholdPopup(varargin)
-% MUSCLETHRESHOLDPOPUP MATLAB code for muscleThresholdPopup.fig
-%      MUSCLETHRESHOLDPOPUP by itself, creates a new MUSCLETHRESHOLDPOPUP or raises the
-%      existing singleton*.
+function varargout = histogramPopup(varargin)
+% HISTOGRAMPOPUP MATLAB code for histogramPopup.fig
+%      HISTOGRAMPOPUP, by itself, creates a new HISTOGRAMPOPUP or raises the existing
+%      singleton*.
 %
-%      H = MUSCLETHRESHOLDPOPUP returns the handle to a new MUSCLETHRESHOLDPOPUP or the handle to
+%      H = HISTOGRAMPOPUP returns the handle to a new HISTOGRAMPOPUP or the handle to
 %      the existing singleton*.
 %
-%      MUSCLETHRESHOLDPOPUP('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in MUSCLETHRESHOLDPOPUP.M with the given input arguments.
+%      HISTOGRAMPOPUP('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in HISTOGRAMPOPUP.M with the given input arguments.
 %
-%      MUSCLETHRESHOLDPOPUP('Property','Value',...) creates a new MUSCLETHRESHOLDPOPUP or raises the
+%      HISTOGRAMPOPUP('Property','Value',...) creates a new HISTOGRAMPOPUP or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before muscleThresholdPopup_OpeningFcn gets called.  An
+%      applied to the GUI before histogramPopup_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to muscleThresholdPopup_OpeningFcn via varargin.
+%      stop.  All inputs are passed to histogramPopup_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help muscleThresholdPopup
+% Edit the above text to modify the response to help histogramPopup
 
-% Last Modified by GUIDE v2.5 20-Jul-2015 14:00:37
+% Last Modified by GUIDE v2.5 21-Jul-2015 11:32:06
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @muscleThresholdPopup_OpeningFcn, ...
-                   'gui_OutputFcn',  @muscleThresholdPopup_OutputFcn, ...
+                   'gui_OpeningFcn', @histogramPopup_OpeningFcn, ...
+                   'gui_OutputFcn',  @histogramPopup_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -43,13 +43,14 @@ else
 end
 % End initialization code - DO NOT EDIT
 
-% --- Executes just before muscleThresholdPopup is made visible.
-function muscleThresholdPopup_OpeningFcn(hObject, eventdata, handles, varargin)
+
+% --- Executes just before histogramPopup is made visible.
+function histogramPopup_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to muscleThresholdPopup (see VARARGIN)
+% varargin   command line arguments to histogramPopup (see VARARGIN)
 
 % Choose default command line output for muscleThresholdPopup
 handles.output = 'Yes';
@@ -72,34 +73,55 @@ if(nargin > 3)
         
         if ~isempty(clusterMap)
             clusterTags = Constants.CLUSTER_MAP_TAGS;
-                       
-            muscleMask = (clusterMap == clusterTags.muscle) | (clusterMap == clusterTags.lowIntMuscle);
-            muscleIntensities = currentImage(muscleMask);
             
-            sliderMin = min(min(muscleIntensities)); 
-            sliderMax = max(max(muscleIntensities)) + 1; %in case you want to set it high enough to let nothing through
+            handles.tempFile = currentFile;
             
-            if isempty(currentFile.lowerMuscleThreshold)
-                sliderMiddle = mean([sliderMin, sliderMax]);
+            currentThresholds = currentFile.thresholds;
+                                   
+            sliderMin = min(min(currentImage)); 
+            sliderMax = currentThresholds.muscleUpper; %in case you want to set it high enough to let nothing through
+            
+            sliderValue = currentThresholds.muscleLower;
             
             sliderStep = 1 / (sliderMax - sliderMin); %sliderStep is percentage
             
             set(handles.thresholdLevelSlider,...
                 'Min', sliderMin,...
                 'Max', sliderMax,...
-                'Value', sliderMiddle,...
+                'Value', sliderValue,...
                 'SliderStep', [sliderStep, sliderStep]);
             
             set(handles.thresholdLowerBound, 'String', num2str(sliderMin));
             set(handles.thresholdUpperBound, 'String', num2str(sliderMax));
-            set(handles.thresholdLevelText, 'String', num2str(sliderMiddle));
+            set(handles.thresholdLevelText, 'String', num2str(sliderValue));
             
             % adds on listener for when the value changes
             addlistener(handles.thresholdLevelSlider,'Value','PreSet',@(~, event)thresholdLevelSliderCallback(hObject, event));
-            
-            currentFile = currentFile.setLowerMuscleThreshold(currentImage, sliderMiddle);
-            
+                        
             mainHandles = drawImage(currentFile, mainHandles);
+            
+            % histogram
+            
+            dims = size(currentImage);
+            
+            roiMasks = currentFile.getRoiMasks(currentImage);
+            
+            roiMask = zeros(dims);
+            
+            for i=1:length(roiMasks)
+                roiMask = roiMask | roiMasks{i};
+            end
+            
+            roiIntensities = currentImage(roiMask);
+            
+            imageMin = min(roiIntensities);
+            imageMax = max(roiIntensities);
+            
+            numBins = imageMax - imageMin + 1;
+            
+            hist(handles.histogramAxes, roiIntensities, numBins);
+            
+            handles.lineHandles = plotThresholds(handles.histogramAxes, currentThresholds, []); 
             
             guidata(handles.mainGuiHObject, mainHandles);
         end
@@ -138,12 +160,13 @@ set(hObject, 'Position', FigPos);
 set(hObject, 'Units', OldUnits);
 
 % Make the GUI modal
-set(handles.thresholdMainPanel,'WindowStyle','modal');
+set(handles.histogramMainPanel,'WindowStyle','modal');
 % UIWAIT makes muscleThresholdPopup wait for user response (see UIRESUME)
-uiwait(handles.thresholdMainPanel);
+uiwait(handles.histogramMainPanel);
+
 
 % --- Outputs from this function are returned to the command line.
-function varargout = muscleThresholdPopup_OutputFcn(hObject, eventdata, handles)
+function varargout = histogramPopup_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -153,26 +176,27 @@ function varargout = muscleThresholdPopup_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 % The figure can be deleted now
-delete(handles.thresholdMainPanel);
+delete(handles.histogramMainPanel);
 
-% --- Executes on button press in thresholdAccept.
-function thresholdAccept_Callback(hObject, eventdata, handles)
-% hObject    handle to thresholdAccept (see GCBO)
+
+% --- Executes on button press in accept.
+function accept_Callback(hObject, eventdata, handles)
+% hObject    handle to accept (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-handles.output = round(get(handles.thresholdLevelSlider, 'Value'));
+handles.output = handles.tempFile;
 
 % Update handles structure
 guidata(hObject, handles);
 
 % Use UIRESUME instead of delete because the OutputFcn needs
 % to get the updated handles structure.
-uiresume(handles.thresholdMainPanel);
+uiresume(handles.histogramMainPanel);
 
-% --- Executes on button press in thresholdCancel.
-function thresholdCancel_Callback(hObject, eventdata, handles)
-% hObject    handle to thresholdCancel (see GCBO)
+% --- Executes on button press in cancel.
+function cancel_Callback(hObject, eventdata, handles)
+% hObject    handle to cancel (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -183,12 +207,23 @@ guidata(hObject, handles);
 
 % Use UIRESUME instead of delete because the OutputFcn needs
 % to get the updated handles structure.
-uiresume(handles.thresholdMainPanel);
+uiresume(handles.histogramMainPanel);
+
+% --- Executes during object creation, after setting all properties.
+function thresholdLevelSlider_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to thresholdLevelSlider (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
 
 
-% --- Executes when user attempts to close thresholdMainPanel.
-function thresholdMainPanel_CloseRequestFcn(hObject, eventdata, handles)
-% hObject    handle to thresholdMainPanel (see GCBO)
+% --- Executes when user attempts to close histogramMainPanel.
+function histogramMainPanel_CloseRequestFcn(hObject, eventdata, handles)
+% hObject    handle to histogramMainPanel (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -201,10 +236,13 @@ else
 end
 
 
-% --- Executes on key press over thresholdMainPanel with no controls selected.
-function thresholdMainPanel_KeyPressFcn(hObject, eventdata, handles)
-% hObject    handle to thresholdMainPanel (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
+% --- Executes on key press with focus on histogramMainPanel and none of its controls.
+function histogramMainPanel_KeyPressFcn(hObject, eventdata, handles)
+% hObject    handle to histogramMainPanel (see GCBO)
+% eventdata  structure with the following fields (see FIGURE)
+%	Key: name of the key that was pressed, in lower case
+%	Character: character interpretation of the key(s) that was pressed
+%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
 % handles    structure with handles and user data (see GUIDATA)
 
 % Check for "enter" or "escape"
@@ -215,20 +253,9 @@ if isequal(get(hObject,'CurrentKey'),'escape')
     % Update handles structure
     guidata(hObject, handles);
     
-    uiresume(handles.thresholdMainPanel);
+    uiresume(handles.histogramMainPanel);
 end    
     
 if isequal(get(hObject,'CurrentKey'),'return')
-    uiresume(handles.thresholdMainPanel);
-end    
-
-% --- Executes during object creation, after setting all properties.
-function thresholdLevelSlider_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to thresholdLevelSlider (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: slider controls usually have a light gray background.
-if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor',[.9 .9 .9]);
+    uiresume(handles.histogramMainPanel);
 end

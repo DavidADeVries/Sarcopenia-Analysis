@@ -34,7 +34,7 @@ else % write stats from pixelCounts
     
     % left ROI stats
     
-    leftCsa = csas.left.fat + csas.left.muscle + csas.left.other;
+    leftCsa = csas.left.all;
     
     set(handles.cellLeftCsa, 'String', sprintf('%6.1f', leftCsa));
     set(handles.cellLeftFatCsa, 'String', sprintf('%6.1f', csas.left.fat));
@@ -45,7 +45,7 @@ else % write stats from pixelCounts
     
     % right ROI stats
     
-    rightCsa = csas.right.fat + csas.right.muscle + csas.right.other;
+    rightCsa = csas.right.all;
     
     set(handles.cellRightCsa, 'String', sprintf('%6.1f', rightCsa));
     set(handles.cellRightFatCsa, 'String', sprintf('%6.1f', csas.right.fat));
@@ -56,7 +56,7 @@ else % write stats from pixelCounts
     
     % all ROIs stats
     
-    totalCsa = csas.total.fat + csas.total.muscle + csas.total.other;
+    totalCsa = csas.total.all;
     
     set(handles.cellTotalCsa, 'String', sprintf('%6.1f', totalCsa));
     set(handles.cellTotalFatCsa, 'String', sprintf('%6.1f', csas.total.fat));

@@ -19,15 +19,15 @@ currentThresholds.muscleLower = threshold;
 set(handles.thresholdLevelSlider, 'Value', threshold);
 set(handles.thresholdLevelText, 'String', num2str(threshold));
 
-handles.lineHandles = plotThresholds(handles.histogramAxes, currentThresholds, handles.lineHandles);
+handles.lineHandle = plotThresholds(handles.histogramAxes, currentThresholds, handles.lineHandle);
 
 tempFile = tempFile.setThresholds(mainHandles.currentImage, currentThresholds);
 
 handles.tempFile = tempFile;
 
+mainHandles = drawImage(currentFile, mainHandles);
 
-mainHandles = drawImage(tempFile, mainHandles);
-updateTissueAnalysisTable(tempFile, mainHandles); 
+updateTissueAnalysisTable(currentFile, mainHandles); 
 
 
 
