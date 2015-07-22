@@ -44,7 +44,7 @@ classdef FamSamFile < File
             highlightGreenChan = zeros(dims);
             highlightBlueChan = zeros(dims);
             
-            transparency = 0.9; % 0 - 1
+            transparency = 1; % 0 - 1
             
             for i=1:dims(1)
                 for j=1:dims(2)      

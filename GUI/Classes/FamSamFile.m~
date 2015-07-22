@@ -271,37 +271,42 @@ classdef FamSamFile < File
         end
         
         %% setThresholds
-        function file = setThresholds(file, image, muscleLower, muscleUpper, fatLower, fatUpper)
-            localThresholds = struct(...
-                'muscleLower', muscleLower,...
-                'muscleUpper', muscleUpper,...
-                'fatLower', fatLower,...
-                'fatUpper', fatUpper);
+        function file = setThresholds(file, image, thresholds)
             
-            file.thresholds = localThresholds;
+            file.thresholds = thresholds;
             
             clusterTags = Constants.CLUSTER_MAP_TAGS;
             
             localClusterMap = file.clusterMap;
             
             if isempty(localClusterMap)
-                            localClusterMap = zeros
-            end
+                validMask = zeros(size(image));
+                
+                preserve = validMask;
+                
+                roiMasks = file.getRoiMasks(image);
+                
+                for i=1:length(roiMasks)
+                    validMask = validMask | roiMasks{i};
+                end
+            else
+                validMask = (localClusterMap ~= 0) & (localClusterMap ~= clusterTags.trimmedFat); %not allowed to touch outside of ROI or trimmed fat
+                
+                preserve = clusterTags.trimmedFat*(localClusterMap == clusterTags.trimmedFat);
+            end            
             
-            validMask = (localClusterMap ~= 0) & (cluster ~= clusterTags.trimmedFat); %not allowed to touch outside of ROI or trimmed fat
+            belowMuscleMask = validMask & (image <= thresholds.muscleLower);
             
-            belowMuscleMask = validMask & (image < muscleLower);
+            muscleMask = validMask & (image >= thresholds.muscleLower) & (image <= thresholds.muscleUpper);
             
-            muscleMask = validMask & (image >= muscleLower) & (image <= muscleUpper);
+            interMuscleFatMask = validMask & (image > thresholds.muscleUpper) & (image < thresholds.fatLower);
             
-            interMuscleFatMask = validMask & (image > muscleUpper) & (image < fatLower);
+            fatMask = validMask & (image >= thresholds.fatLower) & (image <= thresholds.fatUpper);
             
-            fatMask = validMask & (image >= fatLower) & (image <= fatUpper);
-            
-            aboveFatMask = validMask & (image > fatUpper);
+            aboveFatMask = validMask & (image > thresholds.fatUpper);
             
             newClusterMap = ...
-                clusterTags.trimmedFat*(localClusterMap == clusterTags.trimmedFat)... %preserve the trimmed fat
+                preserve... %preserve the trimmed fat
                 + clusterTags.belowMuscle*belowMuscleMask...
                 + clusterTags.muscle*muscleMask...
                 + clusterTags.interMuscleFat*interMuscleFatMask...
