@@ -482,6 +482,8 @@ function selectRoi_ClickedCallback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+disableAllToggles(handles);
+
 currentFile = getCurrentFile(handles);
 
 % imfreehand returns a jagged ROI, so we will take the points from
@@ -802,6 +804,8 @@ currentFile = getCurrentFile(handles);
 numRoi = currentFile.numRoi;
 
 if numRoi == 1 || numRoi == 2 %need left and/or right ROIs, no more, no less
+    
+    disableAllToggles(handles);
     
     image = handles.currentImage;
     dims = size(image);
@@ -1183,6 +1187,8 @@ currentFile = getCurrentFile(handles);
 clusterMap = currentFile.clusterMap;
 
 if ~isempty(clusterMap)
+    disableAllToggles(handles);
+    
     updatedFile = histogramPopup(hObject);
     
     if ~isempty(updatedFile) %user didn't click 'Cancel'
@@ -1201,6 +1207,7 @@ if ~isempty(clusterMap)
     handles = drawImage(currentFile, handles);
     
     updateTissueAnalysisTable(currentFile, handles);    
+    updateToggleButtons(handles);
     
     % push up the changes
     guidata(hObject, handles);
