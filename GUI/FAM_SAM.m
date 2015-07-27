@@ -31,7 +31,7 @@ addpath(strcat(Constants.GIANT_PATH,'Common Module Functions/Plot Impoint'));
 
 % Edit the above text to modify the response to help FAM_SAM
 
-% Last Modified by GUIDE v2.5 21-Jul-2015 15:27:58
+% Last Modified by GUIDE v2.5 23-Jul-2015 14:28:02
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -806,7 +806,7 @@ if numRoi == 1 || numRoi == 2 %need left and/or right ROIs, no more, no less
     image = handles.currentImage;
     dims = size(image);
     
-    roiMasks = currentFile.getRoiMasks(image);
+    roiMasks = currentFile.getRoiMasks();
     
     leftRoiMask = roiMasks{1};
     rightRoiMask = roiMasks{numRoi};
@@ -1223,3 +1223,52 @@ function menuTrimFat_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 trimFat_ClickedCallback(hObject, eventdata, handles);
+
+
+% --------------------------------------------------------------------
+function previousSeries_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to previousSeries (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantPreviousSeries(hObject, handles);
+
+% --------------------------------------------------------------------
+function nextSeries_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to nextSeries (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantNextSeries(hObject, handles);
+
+% --------------------------------------------------------------------
+function exportAsImage_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to exportAsImage (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantExportAsImage(hObject, handles);
+
+% --------------------------------------------------------------------
+function menuPreviousSeries_Callback(hObject, eventdata, handles)
+% hObject    handle to menuPreviousSeries (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+previousSeries_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuNextSeries_Callback(hObject, eventdata, handles)
+% hObject    handle to menuNextSeries (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+nextSeries_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuExportAsImage_Callback(hObject, eventdata, handles)
+% hObject    handle to menuExportAsImage (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+exportAsImage_ClickedCallback(hObject, eventdata, handles);

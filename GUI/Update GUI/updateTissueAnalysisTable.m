@@ -30,7 +30,7 @@ if isempty(currentFile) || isempty(currentFile.clusterMap) % clear it out
     set(handles.cellTotalMusclePercent, 'String', '');
     
 else % write stats from pixelCounts
-    [csas, percentages] = currentFile.getStats(handles.currentImage);
+    [csas, percentages] = currentFile.getStats();
     
     % left ROI stats
     

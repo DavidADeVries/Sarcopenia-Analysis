@@ -3,17 +3,21 @@ classdef Constants
     
     properties (Constant = true)
         % for dev
-        GIANT_PATH = '/data/projects/General Image Analysis Toolkit/GIANT/metadata/';
+        GIANT_PATH = strcat(HighLevelConstants.BASE_DIRECTORY, '/General Image Analysis Toolkit/GIANT/metadata/');
+        ALLOW_CLOSE = true;
         
         % for released
-        %GIANT_PATH = '/data/projects/General Image Analysis Toolkit/Current Release/metadata/';
+        %GIANT_PATH = strcat(HighLevelConstants.BASE_DIRECTORY, '/General Image Analysis Toolkit/Current Release/metadata/');
+        %ALLOW_CLOSE = false;
+        
+        
+        SAVED_PATIENTS_DIRECTORY = strcat(HighLevelConstants.BASE_DIRECTORY, HighLevelConstants.STUDY_DIRECTORY, '/Saved Patient Analysis/'); %make sure it's absolute and ends with '/'
+        RAW_DATA_DIRECTORY = strcat(HighLevelConstants.BASE_DIRECTORY, HighLevelConstants.STUDY_DIRECTORY, '/Raw Data/');
+        CSV_EXPORT_DIRECTORY = strcat(HighLevelConstants.BASE_DIRECTORY, HighLevelConstants.STUDY_DIRECTORY, '/Exported Spreadsheets/');
+        SNAPSHOT_DIRECTORY = strcat(HighLevelConstants.BASE_DIRECTORY, HighLevelConstants.STUDY_DIRECTORY, '/Snapshots/');
         
         CLUSTER_MAP_TAGS = struct('belowMuscle',1,'muscle',2,'interMuscleFat',3,'fat',4,'aboveFat',5,'trimmedFat',6');
-        HIGHLIGHT_TRANSPARENCY = 0.9; %range: 0 - 1
-        
-        SAVED_PATIENTS_DIRECTORY = '/data/projects/Sarcopenia/Sarcopenia Study/Saved Patient Analysis/'; %make sure it's absolute and ends with '/'
-        RAW_DATA_DIRECTORY = '/data/projects/Sarcopenia/Sarcopenia Study/Raw Data/';
-        CSV_EXPORT_DIRECTORY = '/data/projects/Sarcopenia/Sarcopenia Study/Exported Spreadsheets/';        
+        HIGHLIGHT_TRANSPARENCY = 0.9; %range: 0 - 1      
         
         SAVE_TITLE_SUGGESTION = 'Sarcopenia Analysis';
         

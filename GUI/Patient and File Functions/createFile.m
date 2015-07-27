@@ -1,8 +1,10 @@
-function [ file ] = createFile(imageFilename, dicomInfo, imagePath)
+function [ file ] = createFile(imageFilename, dicomInfo, imagePath, image)
 %[ file ] = createFile(imageFilename, dicomInfo, imagePath)
 %   as required by GIANT
 
-file = FamSamFile(imageFilename, dicomInfo, imagePath);
+imageDims = size(image);
+
+file = FamSamFile(imageFilename, dicomInfo, imagePath, imageDims);
 
 end
 

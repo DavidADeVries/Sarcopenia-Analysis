@@ -9,6 +9,8 @@ classdef FamSamFile < File
         muscleHighlightOn = false;
         quickMeasureOn = false;
         
+        imageDims = []; %image dimensions
+        
         thresholds; % structure containing 'muscleLower', 'muscleUpper', 'fatLower', 'fatUpper'. Usually 'muscleUpper' = 'fatLower'
         
         displayUnits = ''; %can be: none, relative, pixel
@@ -19,8 +21,10 @@ classdef FamSamFile < File
     
     methods
         %% Constructor %%
-        function file = FamSamFile(name, dicomInfo, imagePath)
+        function file = FamSamFile(name, dicomInfo, imagePath, imageDims)
             file@File(name, dicomInfo, imagePath);
+            
+            file.imageDims = imageDims;
         end
         
         %% getCurrentImage %%
@@ -38,7 +42,7 @@ classdef FamSamFile < File
             
             normedImage = image/max(max(image));
             
-            dims = size(image);
+            dims = file.imageDims;
             
             highlightRedChan = zeros(dims);
             highlightGreenChan = zeros(dims);
@@ -74,7 +78,7 @@ classdef FamSamFile < File
         %% isValidForExport %%
         % ** required by GIANT **
         function isValid = isValidForExport(file)
-            isValid = ~isempty(file.pixelCounts);
+            isValid = ~isempty(file.clusterMap);
         end
         
         %% getPixelArea %%
@@ -145,13 +149,13 @@ classdef FamSamFile < File
         end
         
          %% getStats %%
-        function [csas, percentages] = getStats(file, image)
+        function [csas, percentages] = getStats(file)
             pixelArea = file.getPixelArea();
             clusterTags = Constants.CLUSTER_MAP_TAGS;
             
             % count up number of pixels for ROIs
             
-            roiMasks = file.getRoiMasks(image);
+            roiMasks = file.getRoiMasks();
             
             leftRoiMask = roiMasks{1};
             
@@ -216,8 +220,8 @@ classdef FamSamFile < File
         
         %% getRoiMasks %%
         % in order from left to right
-        function [roiMasks] = getRoiMasks(file, image)
-            dims = size(image);
+        function [roiMasks] = getRoiMasks(file)
+            dims = file.imageDims;
             
             numRoi = file.numRoi;           
             
@@ -280,11 +284,11 @@ classdef FamSamFile < File
             localClusterMap = file.clusterMap;
             
             if isempty(localClusterMap)
-                validMask = zeros(size(image));
+                validMask = zeros(file.imageDims);
                 
                 preserve = validMask;
                 
-                roiMasks = file.getRoiMasks(image);
+                roiMasks = file.getRoiMasks();
                 
                 for i=1:length(roiMasks)
                     validMask = validMask | roiMasks{i};

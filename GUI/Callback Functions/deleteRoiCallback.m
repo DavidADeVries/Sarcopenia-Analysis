@@ -49,6 +49,11 @@ roiIndex = map(round(clickedPoint(2)), round(clickedPoint(1)));
 if roiIndex ~= 0 % need to delete something
     currentFile = currentFile.deleteRoi(roiIndex);
     
+    % these all need to be reset, since clustering no longer reflects ROIs
+    currentFile.fatHighlightOn = false;
+    currentFile.muscleHighlightOn = false;
+    currentFile.clusterMap = [];
+    
     if currentFile.numRoi == 0 %disable since no more can be deleted
         handles.deleteRoiOn = false;
         
@@ -69,6 +74,8 @@ if roiIndex ~= 0 % need to delete something
     %update roi   
     handles = deleteRoiLine(handles, roiIndex);
     handles = deleteRoiPoints(handles, roiIndex);
+    
+    handles = drawImage(currentFile, handles);
     
     %push up changes
     guidata(hObject, handles);

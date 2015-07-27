@@ -104,7 +104,7 @@ if(nargin > 3)
             
             dims = size(currentImage);
             
-            roiMasks = currentFile.getRoiMasks(currentImage);
+            roiMasks = currentFile.getRoiMasks();
             
             roiMask = zeros(dims);
             
