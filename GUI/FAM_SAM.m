@@ -94,11 +94,33 @@ function FAM_SAM_CloseRequestFcn(hObject, eventdata, handles, varargin)
 giantCloseRequestFcn(hObject, handles);
 
 
+% --- Executes on mouse press over figure background, over a disabled or
+% --- inactive control, or over an axes background.
+function mainPanel_WindowButtonUpFcn(hObject, eventdata, handles)
+% hObject    handle to mainPanel (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantWindowButtonUpFcn(hObject, handles);
+
+
+
 % % % % % % % % % % % % % % % %
 % % GIANT BASE UI FUNCTIONS % %
 % % % % % % % % % % % % % % % %
 
 
+
+% % FILE FUNCTIONS % %
+
+% ONLY FUNCTION IN MENU
+% --------------------------------------------------------------------
+function menuSavePatientAs_Callback(hObject, eventdata, handles)
+% hObject    handle to menuSavePatientAs (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantSavePatientAs(hObject, handles);
 
 % --------------------------------------------------------------------
 function open_ClickedCallback(hObject, eventdata, handles)
@@ -109,12 +131,20 @@ function open_ClickedCallback(hObject, eventdata, handles)
 giantOpen(hObject, handles);
 
 % --------------------------------------------------------------------
-function exportAllPatients_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to menuExportPatient (see GCBO)
+function savePatient_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to savePatient (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-giantExportAllPatients(hObject, handles);
+giantSavePatient(hObject, handles);
+
+% --------------------------------------------------------------------
+function saveAll_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to saveAll (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantSaveAll(hObject, handles);
 
 % --------------------------------------------------------------------
 function exportPatient_ClickedCallback(hObject, eventdata, handles)
@@ -125,12 +155,24 @@ function exportPatient_ClickedCallback(hObject, eventdata, handles)
 giantExportPatient(hObject, handles);
 
 % --------------------------------------------------------------------
-function closeAllPatients_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to closeAllPatients (see GCBO)
+function exportAllPatients_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to menuExportPatient (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-giantCloseAllPatients(hObject, handles);
+giantExportAllPatients(hObject, handles);
+
+% --------------------------------------------------------------------
+function exportAsImage_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to exportAsImage (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantExportAsImage(hObject, handles);
+
+
+% % EDIT FUNCTIONS % %
+
 
 % % % % --------------------------------------------------------------------
 % % % function undo_ClickedCallback(hObject, eventdata, handles) %#ok<*DEFNU>
@@ -201,6 +243,104 @@ updateGui(currentFile, handles);
 guidata(hObject, handles);
 
 
+% % PATIENT MANAGEMENT FUNCTIONS % %
+
+
+% --------------------------------------------------------------------
+function importPatientDirectory_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to importPatientDirectory (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantImportPatientDirectory(hObject, handles);
+
+% --------------------------------------------------------------------
+function addPatient_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to addPatient (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantAddPatient(hObject, handles);
+
+% --------------------------------------------------------------------
+function addStudy_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to menuAddStudy (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantAddStudy(hObject, handles);
+
+% --------------------------------------------------------------------
+function addSeries_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to addSeries (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantAddSeries(hObject, handles);
+
+% --------------------------------------------------------------------
+function addFile_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to addFile (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantAddFile(hObject, handles);
+
+% --------------------------------------------------------------------
+function closePatient_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to closeAllPatients (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantClosePatient(hObject, handles);
+
+% --------------------------------------------------------------------
+function closeAllPatients_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to closeAllPatients (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantCloseAllPatients(hObject, handles);
+
+% --------------------------------------------------------------------
+function removeStudy_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to removeStudy (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantRemoveStudy(hObject, handles);
+
+% --------------------------------------------------------------------
+function removeSeries_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to removeSeries (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantRemoveSeries(hObject, handles);
+
+% --------------------------------------------------------------------
+function removeFile_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to removeFile (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantRemoveFile(hObject, handles);
+
+% --------------------------------------------------------------------
+function previousSeries_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to previousSeries (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantPreviousSeries(hObject, handles);
+
+% --------------------------------------------------------------------
+function nextSeries_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to nextSeries (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantNextSeries(hObject, handles);
 
 % --------------------------------------------------------------------
 function earlierImage_ClickedCallback(hObject, eventdata, handles)
@@ -234,6 +374,10 @@ function latestImage_ClickedCallback(hObject, eventdata, handles)
 
 giantLatestImage(hObject, handles);
 
+
+% % DROP-DOWN SELECTORS % %
+
+
 % --- Executes on selection change in patientSelector.
 function patientSelector_Callback(hObject, eventdata, handles)
 % hObject    handle to patientSelector (see GCBO)
@@ -256,30 +400,6 @@ function patientSelector_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
-% --------------------------------------------------------------------
-function savePatient_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to savePatient (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-giantSavePatient(hObject, handles);
-
-% --------------------------------------------------------------------
-function saveAll_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to saveAll (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-giantSaveAll(hObject, handles);
-
-% --------------------------------------------------------------------
-function closePatient_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to closeAllPatients (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-giantClosePatient(hObject, handles);
 
 % --- Executes on selection change in studySelector.
 function studySelector_Callback(hObject, eventdata, handles)
@@ -327,122 +447,49 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-% --------------------------------------------------------------------
-function addPatient_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to addPatient (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
+
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+
+                    % % % % % % % % % % % % % % % % %
+                    % % MODULE SPECIFIC FUNCTIONS % %
+                    % % % % % % % % % % % % % % % % %
+
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+% % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % % 
+
+
+
+% % % % % % % % % % % % %
+% % ACTION CALLBACKS  % %
+% % % % % % % % % % % % %
+
+
+
+% --- Executes when selected object is changed in unitPanel.
+function unitPanel_SelectionChangeFcn(hObject, eventdata, handles)
+% hObject    handle to the selected object in unitPanel 
+% eventdata  structure with the following fields (see UIBUTTONGROUP)
+%	EventName: string 'SelectionChanged' (read only)
+%	OldValue: handle of the previously selected object or empty if none was selected
+%	NewValue: handle of the currently selected object
 % handles    structure with handles and user data (see GUIDATA)
 
-giantAddPatient(hObject, handles);
-
-% --------------------------------------------------------------------
-function addStudy_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to menuAddStudy (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-giantAddStudy(hObject, handles);
-
-% --------------------------------------------------------------------
-function addSeries_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to addSeries (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-giantAddSeries(hObject, handles);
-
-% --------------------------------------------------------------------
-function addFile_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to addFile (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-giantAddFile(hObject, handles);
-
-% --------------------------------------------------------------------
-function removeStudy_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to removeStudy (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-giantRemoveStudy(hObject, handles);
-
-% --------------------------------------------------------------------
-function removeSeries_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to removeSeries (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-giantRemoveSeries(hObject, handles);
-
-% --------------------------------------------------------------------
-function removeFile_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to removeFile (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-giantRemoveFile(hObject, handles);
-
-% --------------------------------------------------------------------
-function importPatientDirectory_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to importPatientDirectory (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-giantImportPatientDirectory(hObject, handles);
-
-% --------------------------------------------------------------------
-function menuSavePatientAs_Callback(hObject, eventdata, handles)
-% hObject    handle to menuSavePatientAs (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-giantSavePatientAs(hObject, handles);
-
-
-
-
-% % % % % % % % % % % % % % % % %
-% % MODULE SPECIFIC FUNCTIONS % %
-% % % % % % % % % % % % % % % % %
-
-
-
-% --- Executes on mouse press over figure background, over a disabled or
-% --- inactive control, or over an axes background.
-function mainPanel_WindowButtonUpFcn(hObject, eventdata, handles)
-% hObject    handle to mainPanel (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-if handles.updateUndoCache    
-    currentFile = getCurrentFile(handles);
-        
-    %save changes
-    updateUndo = true;
-    pendingChanges = true;
-    
-    handles = updateFile(currentFile, updateUndo, pendingChanges, handles); %undo cache will be auto updated
-    
-    % reset updateUndoCache variable (will on go again when a callback is
-    % triggered, not just any click)
-    handles.updateUndoCache = false;
-    
-    updateToggleButtons(handles);
-    
-    %push up changes
-    guidata(hObject, handles);
-end
-
-% --------------------------------------------------------------------
-function toggleRoi_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to toggleRoi (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+newValue = get(eventdata.NewValue, 'Tag');
 
 currentFile = getCurrentFile(handles);
-    
-currentFile.roiOn = ~currentFile.roiOn;
+
+switch newValue
+    case 'unitNone'
+        currentFile.displayUnits = 'none';
+    case 'unitAbsolute'
+        currentFile.displayUnits = 'absolute';
+    case 'unitPixel'
+        currentFile.displayUnits = 'pixel';
+    otherwise
+        currentFile.displayUnits = 'none';
+end
 
 % finalize changes
 updateUndo = false;
@@ -451,41 +498,13 @@ pendingChanges = true;
 handles = updateFile(currentFile, updateUndo, pendingChanges, handles);
 
 % update display
-toggled = true;
-
-handles = drawAllRoiLines(currentFile, handles, toggled);
-handles = drawAllRoiPointsWithCallbacks(currentFile, handles, hObject, toggled);
-
-updateToggleButtons(handles);
-
-% push up the changes
-guidata(hObject, handles);
-
-
-% --------------------------------------------------------------------
-function toggleQuickMeasure_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to toggleQuickMeasure (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-currentFile = getCurrentFile(handles);
-
-currentFile.quickMeasureOn = ~currentFile.quickMeasureOn;
-
-% finalize changes
-updateUndo = false;
-pendingChanges = true; 
-handles = updateFile(currentFile, updateUndo, pendingChanges, handles);
-
-% update display
-toggled = true;
+toggled = false;
 handles = drawQuickMeasureWithCallback(currentFile, handles, hObject, toggled);
 
-updateToggleButtons(handles);
-updateUnitPanel(currentFile, handles);
-
 % push up the changes
 guidata(hObject, handles);
+
+
 
 % --------------------------------------------------------------------
 function selectRoi_ClickedCallback(hObject, eventdata, handles)
@@ -561,247 +580,36 @@ updateToggleButtons(handles);
 % push up the changes
 guidata(hObject, handles);
 
+
+
 % --------------------------------------------------------------------
-function quickMeasure_ClickedCallback(hObject, eventdata, handles) %#ok<*INUSL>
-% hObject    handle to quickMeasure (see GCBO)
+function deleteRoi_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to deleteRoi (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-lineHandle = imline(handles.imageAxes);
+handles.deleteRoiOn = ~handles.deleteRoiOn;
 
-quickMeasurePoints = lineHandle.getPosition();
+if handles.deleteRoiOn
+    zoom off;
+    pan off;
+    
+    setptr(handles.mainPanel, 'eraser');
+    
+    func = @(~, ~) deleteRoiCallback(hObject);
+    set(handles.imageHandle, 'ButtonDownFcn', func);
+else
+    setptr(handles.mainPanel, 'arrow');
+    
+    set(handles.imageHandle, 'ButtonDownFcn', []);
+end
 
-delete(lineHandle); %will be redrawn shortly, with proper formatting
-
-currentFile = getCurrentFile(handles);
-
-currentFile.quickMeasurePoints = quickMeasurePoints;
-currentFile.quickMeasureOn = true;
-currentFile = currentFile.chooseDisplayUnits();
-
-% finalize changes
-updateUndo = true;
-pendingChanges = true; 
-handles = updateFile(currentFile, updateUndo, pendingChanges, handles);
-
-% update display
-toggled = false;
-handles = drawQuickMeasureWithCallback(currentFile, handles, hObject, toggled);
-
+%update display
 updateToggleButtons(handles);
-updateUnitPanel(currentFile, handles);
 
 % push up the changes
 guidata(hObject, handles);
 
-
-
-
-% --------------------------------------------------------------------
-function menuFile_Callback(hObject, eventdata, handles)
-% hObject    handle to menuFile (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --------------------------------------------------------------------
-function menuOpen_Callback(hObject, eventdata, handles)
-% hObject    handle to menuOpen (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-open_ClickedCallback(hObject, eventdata, handles);
-
-% --------------------------------------------------------------------
-function menuSavePatient_Callback(hObject, eventdata, handles)
-% hObject    handle to menuSavePatient (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-savePatient_ClickedCallback(hObject, eventdata, handles);
-
-% --------------------------------------------------------------------
-function menuSaveAll_Callback(hObject, eventdata, handles)
-% hObject    handle to menuSaveAll (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-saveAll_ClickedCallback(hObject, eventdata, handles);
-
-
-% --------------------------------------------------------------------
-function menuSelectRoi_Callback(hObject, eventdata, handles)
-% hObject    handle to menuSelectRoi (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-selectRoi_ClickedCallback(hObject, eventdata, handles);
-
-% --------------------------------------------------------------------
-function menuQuickMeasure_Callback(hObject, eventdata, handles)
-% hObject    handle to menuQuickMeasure (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-quickMeasure_ClickedCallback(hObject, eventdata, handles);
-
-% --------------------------------------------------------------------
-function menuUndo_Callback(hObject, eventdata, handles)
-% hObject    handle to menuUndo (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-undo_ClickedCallback(hObject, eventdata, handles);
-
-% --------------------------------------------------------------------
-function menuRedo_Callback(hObject, eventdata, handles)
-% hObject    handle to menuRedo (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-redo_ClickedCallback(hObject, eventdata, handles);
-
-
-% --------------------------------------------------------------------
-function menuPerformAnalysis_Callback(hObject, eventdata, handles)
-% hObject    handle to menuPerformAnalysis (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-performAnalysis_ClickedCallback(hObject, eventdata, handles);
-
-
-% --------------------------------------------------------------------
-function menuClosePatient_Callback(hObject, eventdata, handles)
-% hObject    handle to menuClosePatient (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-closePatient_ClickedCallback(hObject, eventdata, handles);
-
-
-% --------------------------------------------------------------------
-function menuEdit_Callback(hObject, eventdata, handles)
-% hObject    handle to menuEdit (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --------------------------------------------------------------------
-function menuTools_Callback(hObject, eventdata, handles)
-% hObject    handle to menuTools (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --------------------------------------------------------------------
-function menuView_Callback(hObject, eventdata, handles)
-% hObject    handle to menuView (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% --------------------------------------------------------------------
-function menuToggleRoi_Callback(hObject, eventdata, handles)
-% hObject    handle to menuToggleRoi (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-toggleRoi_ClickedCallback(hObject, eventdata, handles);
-
-% --------------------------------------------------------------------
-function menuToggleFatHighlighting_Callback(hObject, eventdata, handles)
-% hObject    handle to menuToggleFatHighlighting (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-toggleFatHighlighting_ClickedCallback(hObject, eventdata, handles)
-
-
-% --------------------------------------------------------------------
-function menuToggleQuickMeasure_Callback(hObject, eventdata, handles)
-% hObject    handle to menuToggleQuickMeasure (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-toggleQuickMeasure_ClickedCallback(hObject, eventdata, handles);
-
-
-% --------------------------------------------------------------------
-function menuRemoveFile_Callback(hObject, eventdata, handles)
-% hObject    handle to menuRemoveFile (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-removeFile_ClickedCallback(hObject, eventdata, handles);
-
-
-% --------------------------------------------------------------------
-function generalAccept_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to generalAccept (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-func = get(handles.generalAccept, 'UserData');
-
-switch func
-    otherwise
-        warning('Invalid UserData setting for generalAccept');
-end
-
-
-% --------------------------------------------------------------------
-function generalDecline_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to generalDecline (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-func = get(handles.generalAccept, 'UserData');
-
-switch func
-    otherwise
-        warning('Invalid UserData setting for generalDecline');
-end
-
-% --------------------------------------------------------------------
-function menuAddFile_Callback(hObject, eventdata, handles)
-% hObject    handle to menuAddFile (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-addFile_ClickedCallback(hObject, eventdata, handles);
-
-% --------------------------------------------------------------------
-function menuAddPatient_Callback(hObject, eventdata, handles)
-% hObject    handle to menuAddPatient (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-addPatient_ClickedCallback(hObject, eventdata, handles);
-
-% --------------------------------------------------------------------
-function menuExportPatient_Callback(hObject, eventdata, handles)
-% hObject    handle to menuExportPatient (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-exportPatient_ClickedCallback(hObject, eventdata, handles);
-
-
-% --------------------------------------------------------------------
-function menuCloseAllPatients_Callback(hObject, eventdata, handles)
-% hObject    handle to menuCloseAllPatients (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-closeAllPatients_ClickedCallback(hObject, eventdata, handles);
-
-% --------------------------------------------------------------------
-function menuExportAllPatients_Callback(hObject, eventdata, handles)
-% hObject    handle to menuExportAllPatients (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-exportAllPatients_ClickedCallback(hObject, eventdata, handles);
 
 
 % --------------------------------------------------------------------
@@ -915,198 +723,44 @@ if numRoi == 1 || numRoi == 2 %need left and/or right ROIs, no more, no less
 end
 
 
+
 % --------------------------------------------------------------------
-function toggleFatHighlighting_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to toggleFatHighlighting (see GCBO)
+function setThresholds_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to setThresholds (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 currentFile = getCurrentFile(handles);
 
-currentFile.fatHighlightOn = ~currentFile.fatHighlightOn;
+clusterMap = currentFile.clusterMap;
 
-% finalize changes
-updateUndo = false;
-pendingChanges = true;
-
-handles = updateFile(currentFile, updateUndo, pendingChanges, handles);
-
-% update display
-handles = drawImage(currentFile, handles);
-
-updateToggleButtons(handles);
-
-% push up the changes
-guidata(hObject, handles);
-
-
-% --------------------------------------------------------------------
-function deleteRoi_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to deleteRoi (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-handles.deleteRoiOn = ~handles.deleteRoiOn;
-
-if handles.deleteRoiOn
-    zoom off;
-    pan off;
+if ~isempty(clusterMap)
+    disableAllToggles(handles);
     
-    setptr(handles.mainPanel, 'eraser');
+    updatedFile = histogramPopup(hObject);
     
-    func = @(~, ~) deleteRoiCallback(hObject);
-    set(handles.imageHandle, 'ButtonDownFcn', func);
-else
-    setptr(handles.mainPanel, 'arrow');
+    if ~isempty(updatedFile) %user didn't click 'Cancel'
+        currentFile = updatedFile;
+        
+        % finalize changes
+        updateUndo = true;
+        pendingChanges = true;
+        
+        handles = updateFile(currentFile, updateUndo, pendingChanges, handles);
+    end
+        
+    % update display
+    % update for either case because doing the thresholding selection
+    % changes the displayed image
+    handles = drawImage(currentFile, handles);
     
-    set(handles.imageHandle, 'ButtonDownFcn', []);
+    updateTissueAnalysisTable(currentFile, handles);    
+    updateToggleButtons(handles);
+    
+    % push up the changes
+    guidata(hObject, handles);
 end
 
-%update display
-updateToggleButtons(handles);
-
-% push up the changes
-guidata(hObject, handles);
-
-
-
-% --------------------------------------------------------------------
-function menuDeleteRoi_Callback(hObject, eventdata, handles)
-% hObject    handle to menuDeleteRoi (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-deleteRoi_ClickedCallback(hObject, eventdata, handles);
-
-% --------------------------------------------------------------------
-function menuEarlierImage_Callback(hObject, eventdata, handles)
-% hObject    handle to menuEarlierImage (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-earlierImage_ClickedCallback(hObject, eventdata, handles);
-
-
-% --------------------------------------------------------------------
-function menuLaterImage_Callback(hObject, eventdata, handles)
-% hObject    handle to menuLaterImage (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-laterImage_ClickedCallback(hObject, eventdata, handles);
-
-% --------------------------------------------------------------------
-function menuEarliestImage_Callback(hObject, eventdata, handles)
-% hObject    handle to menuEarliestImage (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-earliestImage_ClickedCallback(hObject, eventdata, handles);
-
-% --------------------------------------------------------------------
-function menuLatestImage_Callback(hObject, eventdata, handles)
-% hObject    handle to menuLatestImage (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-latestImage_ClickedCallback(hObject, eventdata, handles);
-
-
-% --------------------------------------------------------------------
-function menuImportPatientDirectory_Callback(hObject, eventdata, handles)
-% hObject    handle to menuImportPatientDirectory (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-importPatientDirectory_ClickedCallback(hObject, eventdata, handles);
-
-
-% --------------------------------------------------------------------
-function menuAddStudy_Callback(hObject, eventdata, handles)
-% hObject    handle to menuAddStudy (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-addStudy_ClickedCallback(hObject, eventdata, handles);
-
-
-% --------------------------------------------------------------------
-function menuAddSeries_Callback(hObject, eventdata, handles)
-% hObject    handle to menuAddSeries (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-addSeries_ClickedCallback(hObject, eventdata, handles);
-
-
-% --------------------------------------------------------------------
-function menuRemoveStudy_Callback(hObject, eventdata, handles)
-% hObject    handle to menuRemoveStudy (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-removeStudy_ClickedCallback(hObject, eventdata, handles);
-
-
-% --------------------------------------------------------------------
-function menuRemoveSeries_Callback(hObject, eventdata, handles)
-% hObject    handle to menuRemoveSeries (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-removeSeries_ClickedCallback(hObject, eventdata, handles);
-
-
-% --------------------------------------------------------------------
-function menuPatientManagement_Callback(hObject, eventdata, handles)
-% hObject    handle to menuPatientManagement (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes when selected object is changed in unitPanel.
-function unitPanel_SelectionChangeFcn(hObject, eventdata, handles)
-% hObject    handle to the selected object in unitPanel 
-% eventdata  structure with the following fields (see UIBUTTONGROUP)
-%	EventName: string 'SelectionChanged' (read only)
-%	OldValue: handle of the previously selected object or empty if none was selected
-%	NewValue: handle of the currently selected object
-% handles    structure with handles and user data (see GUIDATA)
-
-newValue = get(eventdata.NewValue, 'Tag');
-
-currentFile = getCurrentFile(handles);
-
-switch newValue
-    case 'unitNone'
-        currentFile.displayUnits = 'none';
-    case 'unitAbsolute'
-        currentFile.displayUnits = 'absolute';
-    case 'unitPixel'
-        currentFile.displayUnits = 'pixel';
-    otherwise
-        currentFile.displayUnits = 'none';
-end
-
-% finalize changes
-updateUndo = false;
-pendingChanges = true;
-
-handles = updateFile(currentFile, updateUndo, pendingChanges, handles);
-
-% update display
-toggled = false;
-handles = drawQuickMeasureWithCallback(currentFile, handles, hObject, toggled);
-
-% push up the changes
-guidata(hObject, handles);
-
-
-% --- Executes on mouse press over axes background.
-function imageAxes_ButtonDownFcn(hObject, eventdata, handles)
-% hObject    handle to imageAxes (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
 
 % --------------------------------------------------------------------
@@ -1154,6 +808,133 @@ updateTissueAnalysisTable(currentFile, handles);
 guidata(hObject, handles);
 
 
+
+% --------------------------------------------------------------------
+function quickMeasure_ClickedCallback(hObject, eventdata, handles) %#ok<*INUSL>
+% hObject    handle to quickMeasure (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+lineHandle = imline(handles.imageAxes);
+
+quickMeasurePoints = lineHandle.getPosition();
+
+delete(lineHandle); %will be redrawn shortly, with proper formatting
+
+currentFile = getCurrentFile(handles);
+
+currentFile.quickMeasurePoints = quickMeasurePoints;
+currentFile.quickMeasureOn = true;
+currentFile = currentFile.chooseDisplayUnits();
+
+% finalize changes
+updateUndo = true;
+pendingChanges = true; 
+handles = updateFile(currentFile, updateUndo, pendingChanges, handles);
+
+% update display
+toggled = false;
+handles = drawQuickMeasureWithCallback(currentFile, handles, hObject, toggled);
+
+updateToggleButtons(handles);
+updateUnitPanel(currentFile, handles);
+
+% push up the changes
+guidata(hObject, handles);
+
+
+
+% --------------------------------------------------------------------
+function generalAccept_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to generalAccept (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+func = get(handles.generalAccept, 'UserData');
+
+switch func
+    otherwise
+        warning('Invalid UserData setting for generalAccept');
+end
+
+
+
+% --------------------------------------------------------------------
+function generalDecline_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to generalDecline (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+func = get(handles.generalAccept, 'UserData');
+
+switch func
+    otherwise
+        warning('Invalid UserData setting for generalDecline');
+end
+
+
+
+% % % % % % % % % % % % %
+% % TOGGLE CALLBACKS  % %
+% % % % % % % % % % % % %
+
+
+
+% --------------------------------------------------------------------
+function toggleRoi_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to toggleRoi (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+currentFile = getCurrentFile(handles);
+    
+currentFile.roiOn = ~currentFile.roiOn;
+
+% finalize changes
+updateUndo = false;
+pendingChanges = true;
+
+handles = updateFile(currentFile, updateUndo, pendingChanges, handles);
+
+% update display
+toggled = true;
+
+handles = drawAllRoiLines(currentFile, handles, toggled);
+handles = drawAllRoiPointsWithCallbacks(currentFile, handles, hObject, toggled);
+
+updateToggleButtons(handles);
+
+% push up the changes
+guidata(hObject, handles);
+
+
+
+% --------------------------------------------------------------------
+function toggleFatHighlighting_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to toggleFatHighlighting (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+currentFile = getCurrentFile(handles);
+
+currentFile.fatHighlightOn = ~currentFile.fatHighlightOn;
+
+% finalize changes
+updateUndo = false;
+pendingChanges = true;
+
+handles = updateFile(currentFile, updateUndo, pendingChanges, handles);
+
+% update display
+handles = drawImage(currentFile, handles);
+
+updateToggleButtons(handles);
+
+% push up the changes
+guidata(hObject, handles);
+
+
+
 % --------------------------------------------------------------------
 function toggleMuscleHighlighting_ClickedCallback(hObject, eventdata, handles)
 % hObject    handle to toggleMuscleHighlighting (see GCBO)
@@ -1178,94 +959,196 @@ updateToggleButtons(handles);
 % push up the changes
 guidata(hObject, handles);
 
-% --------------------------------------------------------------------
-function menuToggleMuscleHighlighting_Callback(hObject, eventdata, handles)
-% hObject    handle to menuToggleMuscleHighlighting (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-toggleMuscleHighlighting_ClickedCallback(hObject, eventdata, handles);
 
 
 % --------------------------------------------------------------------
-function setThresholds_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to setThresholds (see GCBO)
+function toggleQuickMeasure_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to toggleQuickMeasure (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 currentFile = getCurrentFile(handles);
 
-clusterMap = currentFile.clusterMap;
+currentFile.quickMeasureOn = ~currentFile.quickMeasureOn;
 
-if ~isempty(clusterMap)
-    disableAllToggles(handles);
-    
-    updatedFile = histogramPopup(hObject);
-    
-    if ~isempty(updatedFile) %user didn't click 'Cancel'
-        currentFile = updatedFile;
-        
-        % finalize changes
-        updateUndo = true;
-        pendingChanges = true;
-        
-        handles = updateFile(currentFile, updateUndo, pendingChanges, handles);
-    end
-        
-    % update display
-    % update for either case because doing the thresholding selection
-    % changes the displayed image
-    handles = drawImage(currentFile, handles);
-    
-    updateTissueAnalysisTable(currentFile, handles);    
-    updateToggleButtons(handles);
-    
-    % push up the changes
-    guidata(hObject, handles);
-end
+% finalize changes
+updateUndo = false;
+pendingChanges = true; 
+handles = updateFile(currentFile, updateUndo, pendingChanges, handles);
+
+% update display
+toggled = true;
+handles = drawQuickMeasureWithCallback(currentFile, handles, hObject, toggled);
+
+updateToggleButtons(handles);
+updateUnitPanel(currentFile, handles);
+
+% push up the changes
+guidata(hObject, handles);
 
 
-% --------------------------------------------------------------------
-function menuSetThresholds_Callback(hObject, eventdata, handles)
-% hObject    handle to menuSetThresholds (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-setThresholds_ClickedCallback(hObject, eventdata, handles);
+
+% % % % % % % % % % % %
+% % MENU CALLBACKS  % %
+% % % % % % % % % % % %
+
+
+
+
+% these simply call their clickable toolbar counterparts
+
+
+
+% MENU FILE CALLBACKS
+
 
 
 % --------------------------------------------------------------------
-function menuTrimFat_Callback(hObject, eventdata, handles)
-% hObject    handle to menuTrimFat (see GCBO)
+function menuFile_Callback(hObject, eventdata, handles)
+% hObject    handle to menuFile (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-trimFat_ClickedCallback(hObject, eventdata, handles);
+% --------------------------------------------------------------------
+function menuOpen_Callback(hObject, eventdata, handles)
+% hObject    handle to menuOpen (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+open_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuSavePatient_Callback(hObject, eventdata, handles)
+% hObject    handle to menuSavePatient (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+savePatient_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuSaveAll_Callback(hObject, eventdata, handles)
+% hObject    handle to menuSaveAll (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+saveAll_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuExportPatient_Callback(hObject, eventdata, handles)
+% hObject    handle to menuExportPatient (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+exportPatient_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuExportAllPatients_Callback(hObject, eventdata, handles)
+% hObject    handle to menuExportAllPatients (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+exportAllPatients_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuExportAsImage_Callback(hObject, eventdata, handles)
+% hObject    handle to menuExportAsImage (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+exportAsImage_ClickedCallback(hObject, eventdata, handles);
+
+
+
+% MENU PATIENT MANAGMENT CALLBACKS
+
 
 
 % --------------------------------------------------------------------
-function previousSeries_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to previousSeries (see GCBO)
+function menuPatientManagement_Callback(hObject, eventdata, handles)
+% hObject    handle to menuPatientManagement (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-giantPreviousSeries(hObject, handles);
 
 % --------------------------------------------------------------------
-function nextSeries_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to nextSeries (see GCBO)
+function menuImportPatientDirectory_Callback(hObject, eventdata, handles)
+% hObject    handle to menuImportPatientDirectory (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-giantNextSeries(hObject, handles);
+importPatientDirectory_ClickedCallback(hObject, eventdata, handles);
 
 % --------------------------------------------------------------------
-function exportAsImage_ClickedCallback(hObject, eventdata, handles)
-% hObject    handle to exportAsImage (see GCBO)
+function menuAddPatient_Callback(hObject, eventdata, handles)
+% hObject    handle to menuAddPatient (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-giantExportAsImage(hObject, handles);
+addPatient_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuAddStudy_Callback(hObject, eventdata, handles)
+% hObject    handle to menuAddStudy (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+addStudy_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuAddSeries_Callback(hObject, eventdata, handles)
+% hObject    handle to menuAddSeries (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+addSeries_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuAddFile_Callback(hObject, eventdata, handles)
+% hObject    handle to menuAddFile (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+addFile_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuClosePatient_Callback(hObject, eventdata, handles)
+% hObject    handle to menuClosePatient (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+closePatient_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuCloseAllPatients_Callback(hObject, eventdata, handles)
+% hObject    handle to menuCloseAllPatients (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+closeAllPatients_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuRemoveStudy_Callback(hObject, eventdata, handles)
+% hObject    handle to menuRemoveStudy (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+removeStudy_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuRemoveSeries_Callback(hObject, eventdata, handles)
+% hObject    handle to menuRemoveSeries (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+removeSeries_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuRemoveFile_Callback(hObject, eventdata, handles)
+% hObject    handle to menuRemoveFile (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+removeFile_ClickedCallback(hObject, eventdata, handles);
 
 % --------------------------------------------------------------------
 function menuPreviousSeries_Callback(hObject, eventdata, handles)
@@ -1284,9 +1167,165 @@ function menuNextSeries_Callback(hObject, eventdata, handles)
 nextSeries_ClickedCallback(hObject, eventdata, handles);
 
 % --------------------------------------------------------------------
-function menuExportAsImage_Callback(hObject, eventdata, handles)
-% hObject    handle to menuExportAsImage (see GCBO)
+function menuEarlierImage_Callback(hObject, eventdata, handles)
+% hObject    handle to menuEarlierImage (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-exportAsImage_ClickedCallback(hObject, eventdata, handles);
+earlierImage_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuLaterImage_Callback(hObject, eventdata, handles)
+% hObject    handle to menuLaterImage (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+laterImage_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuEarliestImage_Callback(hObject, eventdata, handles)
+% hObject    handle to menuEarliestImage (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+earliestImage_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuLatestImage_Callback(hObject, eventdata, handles)
+% hObject    handle to menuLatestImage (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+latestImage_ClickedCallback(hObject, eventdata, handles);
+
+
+
+% MENU EDIT CALLBACKS
+
+
+
+% --------------------------------------------------------------------
+function menuEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to menuEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% --------------------------------------------------------------------
+function menuUndo_Callback(hObject, eventdata, handles)
+% hObject    handle to menuUndo (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+undo_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuRedo_Callback(hObject, eventdata, handles)
+% hObject    handle to menuRedo (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+redo_ClickedCallback(hObject, eventdata, handles);
+
+
+
+% MENU TOOLS CALLBACKS
+
+
+
+% --------------------------------------------------------------------
+function menuTools_Callback(hObject, eventdata, handles)
+% hObject    handle to menuTools (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% --------------------------------------------------------------------
+function menuSelectRoi_Callback(hObject, eventdata, handles)
+% hObject    handle to menuSelectRoi (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+selectRoi_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuDeleteRoi_Callback(hObject, eventdata, handles)
+% hObject    handle to menuDeleteRoi (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+deleteRoi_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuPerformAnalysis_Callback(hObject, eventdata, handles)
+% hObject    handle to menuPerformAnalysis (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+performAnalysis_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuSetThresholds_Callback(hObject, eventdata, handles)
+% hObject    handle to menuSetThresholds (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+setThresholds_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuTrimFat_Callback(hObject, eventdata, handles)
+% hObject    handle to menuTrimFat (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+trimFat_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuQuickMeasure_Callback(hObject, eventdata, handles)
+% hObject    handle to menuQuickMeasure (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+quickMeasure_ClickedCallback(hObject, eventdata, handles);
+
+
+
+% MENU VIEW (TOGGLE) CALLBACKS
+
+
+
+% --------------------------------------------------------------------
+function menuView_Callback(hObject, eventdata, handles)
+% hObject    handle to menuView (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% --------------------------------------------------------------------
+function menuToggleRoi_Callback(hObject, eventdata, handles)
+% hObject    handle to menuToggleRoi (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+toggleRoi_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuToggleFatHighlighting_Callback(hObject, eventdata, handles)
+% hObject    handle to menuToggleFatHighlighting (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+toggleFatHighlighting_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuToggleMuscleHighlighting_Callback(hObject, eventdata, handles)
+% hObject    handle to menuToggleMuscleHighlighting (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+toggleMuscleHighlighting_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
+function menuToggleQuickMeasure_Callback(hObject, eventdata, handles)
+% hObject    handle to menuToggleQuickMeasure (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+toggleQuickMeasure_ClickedCallback(hObject, eventdata, handles);
