@@ -83,6 +83,17 @@ function varargout = FAM_SAM_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 
+% --- Executes just before GAS_SAM is made visible.
+function FAM_SAM_CloseRequestFcn(hObject, eventdata, handles, varargin)
+% This function has no output args, see OutputFcn.
+% hObject    handle to figure
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+% varargin   command line arguments to FAM_SAM (see VARARGIN)
+
+giantCloseRequestFcn(hObject, handles);
+
+
 % % % % % % % % % % % % % % % %
 % % GIANT BASE UI FUNCTIONS % %
 % % % % % % % % % % % % % % % %
