@@ -17,7 +17,7 @@ classdef Constants
         SNAPSHOT_DIRECTORY = strcat(HighLevelConstants.BASE_DIRECTORY, HighLevelConstants.STUDY_DIRECTORY, '/Snapshots/');
         
         CLUSTER_MAP_TAGS = struct('belowMuscle',1,'muscle',2,'interMuscleFat',3,'fat',4,'aboveFat',5,'trimmedFat',6');
-        HIGHLIGHT_TRANSPARENCY = 0.9; %range: 0 - 1      
+        HIGHLIGHT_TRANSPARENCY = 1; %range: 0 - 1 (1 is opaque, 0 is clear)     
         
         SAVE_TITLE_SUGGESTION = 'Sarcopenia Analysis';
         
