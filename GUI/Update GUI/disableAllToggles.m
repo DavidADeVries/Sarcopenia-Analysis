@@ -33,10 +33,6 @@ set(handles.toggleFatHighlighting, 'State', 'off');
 set(handles.toggleMuscleHighlighting, 'State', 'off');
 set(handles.toggleQuickMeasure, 'State', 'off');
 
-% don't even want to see these ones
-set(handles.generalAccept, 'Visible', 'off');
-set(handles.generalDecline, 'Visible', 'off');
-
 %menu options
 
 set(handles.menuSelectRoi, 'Enable', 'off');
