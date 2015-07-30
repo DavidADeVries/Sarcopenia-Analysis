@@ -31,7 +31,7 @@ addpath(strcat(Constants.GIANT_PATH,'Common Module Functions/Plot Impoint'));
 
 % Edit the above text to modify the response to help FAM_SAM
 
-% Last Modified by GUIDE v2.5 27-Jul-2015 12:13:39
+% Last Modified by GUIDE v2.5 30-Jul-2015 14:58:38
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -83,13 +83,14 @@ function varargout = FAM_SAM_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 
-% --- Executes just before GAS_SAM is made visible.
-function FAM_SAM_CloseRequestFcn(hObject, eventdata, handles, varargin)
-% This function has no output args, see OutputFcn.
-% hObject    handle to figure
+% --- Executes when user attempts to close mainPanel.
+function mainPanel_CloseRequestFcn(hObject, eventdata, handles)
+% hObject    handle to mainPanel (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to FAM_SAM (see VARARGIN)
+
+% Hint: delete(hObject) closes the figure
+% delete(hObject);
 
 giantCloseRequestFcn(hObject, handles);
 
@@ -1329,3 +1330,6 @@ function menuToggleQuickMeasure_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 toggleQuickMeasure_ClickedCallback(hObject, eventdata, handles);
+
+
+
