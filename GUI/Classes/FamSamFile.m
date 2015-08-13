@@ -13,7 +13,7 @@ classdef FamSamFile < File
         
         thresholds; % structure containing 'muscleLower', 'muscleUpper', 'fatLower', 'fatUpper'. Usually 'muscleUpper' = 'fatLower'
         
-        displayUnits = ''; %can be: none, relative, pixel
+        displayUnits = 'none'; %can be: none, relative, pixel
         
         roiPoints = cell(0);        
         quickMeasurePoints = [];
@@ -21,8 +21,8 @@ classdef FamSamFile < File
     
     methods
         %% Constructor %%
-        function file = FamSamFile(name, dicomInfo, imagePath, imageDims)
-            file@File(name, dicomInfo, imagePath);
+        function file = FamSamFile(name, dicomInfo, imagePath, image, imageDims)
+            file@File(name, dicomInfo, imagePath, image);
             
             file.imageDims = imageDims;
         end

@@ -1,7 +1,6 @@
-function [ handles ] = drawAll(currentFile, handles, hObject, varargin )
-%[ handles ] = drawAll(currentFile, handles, hObject, saveZoom*)
+function [ handles ] = drawAll(currentFile, handles, hObject)
+%[ handles ] = drawAll(currentFile, handles, hObject)
 % Used when switching or opening files to get everything up right away
-% saveZoom optional: default is false
 
 handles = deleteAll(handles); % clear it all out first
 
@@ -10,13 +9,7 @@ if isempty(currentFile)
 else
     toggled = false;
     
-    saveZoom = false;
-    
-    if length(varargin) == 1
-        saveZoom = varargin{1};
-    end
-    
-    handles = drawImage(currentFile, handles, saveZoom);
+    handles = drawImage(currentFile, handles);
     handles = drawAllRoiLines(currentFile, handles, toggled);
     handles = drawAllRoiPointsWithCallbacks(currentFile, handles, hObject, toggled);
     handles = drawQuickMeasureWithCallback(currentFile, handles, hObject, toggled);        

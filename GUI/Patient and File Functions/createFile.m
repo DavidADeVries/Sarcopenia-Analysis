@@ -4,7 +4,7 @@ function [ file ] = createFile(imageFilename, dicomInfo, imagePath, image)
 
 imageDims = size(image);
 
-file = FamSamFile(imageFilename, dicomInfo, imagePath, imageDims);
+file = FamSamFile(imageFilename, dicomInfo, imagePath, image, imageDims);
 
 end
 

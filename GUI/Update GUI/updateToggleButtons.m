@@ -12,11 +12,7 @@ currentFile = getCurrentFile(handles);
 
 if ~isempty(currentFile) %add in module file operations
     % on no matter what state currentFile is in
-    
-    set(handles.zoomIn, 'Enable', 'on');
-    set(handles.zoomOut, 'Enable', 'on');
-    set(handles.pan, 'Enable', 'on');
-    
+        
     set(handles.selectRoi, 'Enable', 'on');
     set(handles.quickMeasure, 'Enable', 'on');
     

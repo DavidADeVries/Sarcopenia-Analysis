@@ -6,14 +6,6 @@ disableAllGiantToggleButtons(handles);
 
 %toolbar options
 
-set(handles.zoomIn, 'Enable', 'off');
-set(handles.zoomOut, 'Enable', 'off');
-set(handles.pan, 'Enable', 'off');
-
-set(handles.zoomIn, 'State', 'off');
-set(handles.zoomOut, 'State', 'off');
-set(handles.pan, 'State', 'off');
-
 set(handles.selectRoi, 'Enable', 'off');
 set(handles.deleteRoi, 'Enable', 'off');
 set(handles.performAnalysis, 'Enable', 'off');
