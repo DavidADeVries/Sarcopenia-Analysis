@@ -3,35 +3,39 @@ classdef CacheEntry
     %command to be performed
     
     properties
-        highlightedImage
+        clusterMap
         roiOn
-        highlightingOn
+        fatHighlightOn
+        muscleHighlightOn
         quickMeasureOn
+        
+        thresholds
         
         roiPoints
         quickMeasurePoints
-        pixelCounts
     end
     
     methods
         function cacheEntry = CacheEntry(file)
-            cacheEntry.highlightedImage = file.highlightedImage;
+            cacheEntry.clusterMap = file.clusterMap;
             cacheEntry.roiOn = file.roiOn;
-            cacheEntry.highlightingOn = file.highlightingOn;
+            cacheEntry.fatHighlightOn = file.fatHighlightOn;
+            cacheEntry.muscleHighlightOn = file.muscleHighlightOn;
             cacheEntry.quickMeasureOn = file.quickMeasureOn;
+            cacheEntry.thresholds = file.thresholds;
             cacheEntry.roiPoints = file.roiPoints;
             cacheEntry.quickMeasurePoints = file.quickMeasurePoints;
-            cacheEntry.pixelCounts = file.pixelCounts;
         end
         
         function file = restoreToFile(cacheEntry, file)
-            file.highlightedImage = cacheEntry.highlightedImage;
+            file.clusterMap = cacheEntry.clusterMap;
             file.roiOn = cacheEntry.roiOn;
-            file.highlightingOn = cacheEntry.highlightingOn;
+            file.fatHighlightOn = cacheEntry.fatHighlightOn;
+            file.muscleHighlightOn = cacheEntry.muscleHighlightOn;
             file.quickMeasureOn = cacheEntry.quickMeasureOn;
+            file.thresholds = cacheEntry.thresholds;
             file.roiPoints = cacheEntry.roiPoints;
             file.quickMeasurePoints = cacheEntry.quickMeasurePoints;
-            file.pixelCounts = cacheEntry.pixelCounts;
         end
     end
     

@@ -5,6 +5,7 @@ function [ ] = updateGuiForSeriesImageChange(currentFile, handles)
 updateImageInfo(currentFile, handles);
 updateToggleButtons(handles);
 updateUnitPanel(currentFile, handles);
+updateTissueAnalysisTable(currentFile, handles);
 
 end
 

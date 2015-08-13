@@ -4,60 +4,66 @@ function [ ] = updateTissueAnalysisTable(currentFile, handles)
 % regarding the segmentation are updated.
 % pixelArea should be in mm^2
 
-if isempty(currentFile) || isempty(currentFile.pixelCounts) % clear it out
+if isempty(currentFile) || isempty(currentFile.clusterMap) % clear it out
     
+    set(handles.cellLeftCsa, 'String', '');
     set(handles.cellLeftFatCsa, 'String', '');
     set(handles.cellLeftMuscleCsa, 'String', '');
-    set(handles.cellLeftLowCsa, 'String', '');
     
     set(handles.cellLeftFatPercent, 'String', '');
     set(handles.cellLeftMusclePercent, 'String', '');
     
     % right ROI stats
+    set(handles.cellRightCsa, 'String', '');
     set(handles.cellRightFatCsa, 'String', '');
     set(handles.cellRightMuscleCsa, 'String', '');
-    set(handles.cellRightLowCsa, 'String', '');
     
     set(handles.cellRightFatPercent, 'String', '');
     set(handles.cellRightMusclePercent, 'String', '');
     
     % all ROIs stats
+    set(handles.cellTotalCsa, 'String', '');
     set(handles.cellTotalFatCsa, 'String', '');
     set(handles.cellTotalMuscleCsa, 'String', '');
-    set(handles.cellTotalLowCsa, 'String', '');
     
     set(handles.cellTotalFatPercent, 'String', '');
     set(handles.cellTotalMusclePercent, 'String', '');
     
 else % write stats from pixelCounts
-    
-    pixelArea = currentFile.getPixelArea();
-    
-    [csas, percentages] = currentFile.pixelCounts.getStats(pixelArea);
+    [csas, percentages] = currentFile.getStats();
     
     % left ROI stats
-    set(handles.cellLeftFatCsa, 'String', csas.left.high);
-    set(handles.cellLeftMuscleCsa, 'String', csas.left.mid);
-    set(handles.cellLeftLowCsa, 'String', csas.left.low);
     
-    set(handles.cellLeftFatPercent, 'String', percentages.left.high);
-    set(handles.cellLeftMusclePercent, 'String', percentages.left.mid);
+    leftCsa = csas.left.all;
+    
+    set(handles.cellLeftCsa, 'String', sprintf('%6.1f', leftCsa));
+    set(handles.cellLeftFatCsa, 'String', sprintf('%6.1f', csas.left.fat));
+    set(handles.cellLeftMuscleCsa, 'String', sprintf('%6.1f', csas.left.muscle));
+    
+    set(handles.cellLeftFatPercent, 'String', sprintf('%6.1f', percentages.left.fat));
+    set(handles.cellLeftMusclePercent, 'String', sprintf('%6.1f', percentages.left.muscle));
     
     % right ROI stats
-    set(handles.cellRightFatCsa, 'String', csas.right.high);
-    set(handles.cellRightMuscleCsa, 'String', csas.right.mid);
-    set(handles.cellRightLowCsa, 'String', csas.right.low);
     
-    set(handles.cellRightFatPercent, 'String', percentages.right.high);
-    set(handles.cellRightMusclePercent, 'String', percentages.right.mid);
+    rightCsa = csas.right.all;
+    
+    set(handles.cellRightCsa, 'String', sprintf('%6.1f', rightCsa));
+    set(handles.cellRightFatCsa, 'String', sprintf('%6.1f', csas.right.fat));
+    set(handles.cellRightMuscleCsa, 'String', sprintf('%6.1f', csas.right.muscle));
+    
+    set(handles.cellRightFatPercent, 'String', sprintf('%6.1f', percentages.right.fat));
+    set(handles.cellRightMusclePercent, 'String', sprintf('%6.1f', percentages.right.muscle));
     
     % all ROIs stats
-    set(handles.cellTotalFatCsa, 'String', csas.total.high);
-    set(handles.cellTotalMuscleCsa, 'String', csas.total.mid);
-    set(handles.cellTotalLowCsa, 'String', csas.total.low);
     
-    set(handles.cellTotalFatPercent, 'String', percentages.total.high);
-    set(handles.cellTotalMusclePercent, 'String', percentages.total.mid);
+    totalCsa = csas.total.all;
+    
+    set(handles.cellTotalCsa, 'String', sprintf('%6.1f', totalCsa));
+    set(handles.cellTotalFatCsa, 'String', sprintf('%6.1f', csas.total.fat));
+    set(handles.cellTotalMuscleCsa, 'String', sprintf('%6.1f', csas.total.muscle));
+    
+    set(handles.cellTotalFatPercent, 'String', sprintf('%6.1f', percentages.total.fat));
+    set(handles.cellTotalMusclePercent, 'String', sprintf('%6.1f', percentages.total.muscle));
     
 end
 

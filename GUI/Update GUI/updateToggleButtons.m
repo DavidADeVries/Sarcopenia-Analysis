@@ -12,11 +12,7 @@ currentFile = getCurrentFile(handles);
 
 if ~isempty(currentFile) %add in module file operations
     % on no matter what state currentFile is in
-    
-    set(handles.zoomIn, 'Enable', 'on');
-    set(handles.zoomOut, 'Enable', 'on');
-    set(handles.pan, 'Enable', 'on');
-    
+        
     set(handles.selectRoi, 'Enable', 'on');
     set(handles.quickMeasure, 'Enable', 'on');
     
@@ -38,14 +34,29 @@ if ~isempty(currentFile) %add in module file operations
     end
     
     %analysis highlighting
-    if ~isempty(currentFile.highlightedImage)
-        set(handles.toggleHighlighting, 'Enable', 'on');
-        set(handles.menuToggleHighlighting, 'Enable', 'on');
+    if ~isempty(currentFile.clusterMap)
+        set(handles.toggleFatHighlighting, 'Enable', 'on');
+        set(handles.toggleMuscleHighlighting, 'Enable', 'on');
+        
+        set(handles.menuToggleFatHighlighting, 'Enable', 'on');
+        set(handles.menuToggleMuscleHighlighting, 'Enable', 'on');
+        
+        % allow trimming        
+        set(handles.setThresholds, 'Enable', 'on');
+        set(handles.trimFat, 'Enable', 'on');
+        
+        set(handles.menuSetThresholds, 'Enable', 'on');
+        set(handles.menuTrimFat, 'Enable', 'on');
     end
     
-    if currentFile.highlightingOn
-        set(handles.toggleHighlighting, 'State', 'on');
-        set(handles.menuToggleHighlighting, 'Checked', 'on');
+    if currentFile.fatHighlightOn
+        set(handles.toggleFatHighlighting, 'State', 'on');
+        set(handles.menuToggleFatHighlighting, 'Checked', 'on');
+    end
+    
+    if currentFile.muscleHighlightOn
+        set(handles.toggleMuscleHighlighting, 'State', 'on');
+        set(handles.menuToggleMuscleHighlighting, 'Checked', 'on');
     end
     
     % delete roi

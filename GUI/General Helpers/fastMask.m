@@ -29,7 +29,7 @@ for j=2:height(splinePoints)
     lastPoint = curPoint;
 end
 
-mask = imfill(mask,'holes');
+mask = im2bw(imfill(mask,'holes'), 0.5);
 
 end
 
