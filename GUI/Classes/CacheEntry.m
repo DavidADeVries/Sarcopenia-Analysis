@@ -11,6 +11,8 @@ classdef CacheEntry
         
         thresholds
         
+        displayUnits
+        
         roiPoints
         quickMeasurePoints
     end
@@ -23,6 +25,7 @@ classdef CacheEntry
             cacheEntry.muscleHighlightOn = file.muscleHighlightOn;
             cacheEntry.quickMeasureOn = file.quickMeasureOn;
             cacheEntry.thresholds = file.thresholds;
+            cacheEntry.displayUnits = file.displayUnits;
             cacheEntry.roiPoints = file.roiPoints;
             cacheEntry.quickMeasurePoints = file.quickMeasurePoints;
         end
@@ -34,6 +37,7 @@ classdef CacheEntry
             file.muscleHighlightOn = cacheEntry.muscleHighlightOn;
             file.quickMeasureOn = cacheEntry.quickMeasureOn;
             file.thresholds = cacheEntry.thresholds;
+            file.displayUnits = cacheEntry.displayUnits;
             file.roiPoints = cacheEntry.roiPoints;
             file.quickMeasurePoints = cacheEntry.quickMeasurePoints;
         end
