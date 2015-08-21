@@ -32,7 +32,7 @@ addpath(strcat(Constants.GIANT_PATH,'Common Module Functions/Line Labels'));
 
 % Edit the above text to modify the response to help FAM_SAM
 
-% Last Modified by GUIDE v2.5 30-Jul-2015 14:58:38
+% Last Modified by GUIDE v2.5 20-Aug-2015 11:04:27
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -208,10 +208,8 @@ pendingChanges = true;
 handles = updateFile(currentFile, updateUndo, pendingChanges, handles);
 
 % update display
-saveZoom = true; % preserves current zoom state
-
 handles = deleteAll(handles);
-handles = drawAll(currentFile, handles, hObject, saveZoom);
+handles = drawAll(currentFile, handles, hObject);
 
 updateGui(currentFile, handles);
 
@@ -234,10 +232,8 @@ pendingChanges = true;
 handles = updateFile(currentFile, updateUndo, pendingChanges, handles);
 
 % update display
-saveZoom = true; % preserves current zoom state
-
 handles = deleteAll(handles);
-handles = drawAll(currentFile, handles, hObject, saveZoom);
+handles = drawAll(currentFile, handles, hObject);
 
 updateGui(currentFile, handles);
 
@@ -375,6 +371,14 @@ function latestImage_ClickedCallback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 giantLatestImage(hObject, handles);
+
+% --------------------------------------------------------------------
+function resetImage_ClickedCallback(hObject, eventdata, handles)
+% hObject    handle to resetImage (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+giantResetImage(hObject, handles);
 
 
 % % DROP-DOWN SELECTORS % %
@@ -1241,6 +1245,14 @@ function menuTools_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % --------------------------------------------------------------------
+function menuResetImage_Callback(hObject, eventdata, handles)
+% hObject    handle to menuResetImage (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+resetImage_ClickedCallback(hObject, eventdata, handles);
+
+% --------------------------------------------------------------------
 function menuSelectRoi_Callback(hObject, eventdata, handles)
 % hObject    handle to menuSelectRoi (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -1331,6 +1343,3 @@ function menuToggleQuickMeasure_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 toggleQuickMeasure_ClickedCallback(hObject, eventdata, handles);
-
-
-

@@ -13,7 +13,7 @@ classdef FamSamFile < File
         
         thresholds; % structure containing 'muscleLower', 'muscleUpper', 'fatLower', 'fatUpper'. Usually 'muscleUpper' = 'fatLower'
         
-        displayUnits = 'none'; %can be: none, relative, pixel
+        displayUnits = ''; %can be: none, absolute, relative, pixel. '' means units have not yet been used.
         
         roiPoints = cell(0);        
         quickMeasurePoints = [];
