@@ -1,13 +1,6 @@
 function varargout = FAM_SAM(varargin)
 
-% add needed librarys
 
-addpath(genpath('.')); %add all subfolders in the current directory
-
-addpath(genpath(strcat(Constants.GIANT_PATH, 'GIANT Code')));
-addpath(strcat(Constants.GIANT_PATH, 'Common Module Functions/Quick Measure'));
-addpath(strcat(Constants.GIANT_PATH,'Common Module Functions/Plot Impoint'));
-addpath(strcat(Constants.GIANT_PATH,'Common Module Functions/Line Labels'));
 
 % FAM_SAM MATLAB code for FAM_SAM.fig
 %      FAM_SAM, by itself, creates a new FAM_SAM or raises the existing
